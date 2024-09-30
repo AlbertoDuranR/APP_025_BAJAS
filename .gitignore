@@ -1,0 +1,14 @@
+# Ignorar archivos y carpetas relacionados a VSCode
+/.vscode/*
+/.editorconfig
+
+# Ignorar archivos y carpetas relacionados a Python
+/env/
+/**/__pycache__/*
+/static/uploads/*
+/*.csv
+
+/.env/
+# Ignorar los tests individuales
+/tests/*
+
