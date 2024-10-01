@@ -20,6 +20,7 @@ def process_index():
 def upload():
     # Verificar si se ha enviado un archivo en la petición
     file = request.files.get('file')
+    period = request.form.get('period')
 
     if not file:
         return jsonify({'success': False, 'message': 'No se cargó ningún archivo', 'data': None})
@@ -34,8 +35,10 @@ def upload():
         file.save(file_path)
 
         # crear el archivo para acepta
-        model.fileCleanup(file_path)
-
+        responseClean = model.fileCleanup(file_path, period)
+        if responseClean['success'] == False:
+            return responseClean
+        
         # Retornar respuesta exitosa
         return jsonify({
             'success': True,

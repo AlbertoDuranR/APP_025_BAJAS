@@ -11,11 +11,39 @@ class excelUtils:
         # Eliminar filas que contienen "Total" o "Filtros aplicados"
         df_cleaned = df[~df.iloc[:, 0].str.contains('Total|Filtros aplicados', na=False)].copy()
 
-        # Formatear columna 'Fecha' si existe
-        if 'Fecha' in df_cleaned.columns:
-            df_cleaned['Fecha'] = pd.to_datetime(df_cleaned['Fecha'], errors='coerce').dt.strftime('%d/%m/%Y')
 
         return df_cleaned
+    
+    def filterByPeriod(self, df, period):
+        """
+        Filtrar las filas que coincidan con el período proporcionado.
+        El período debe estar en formato 'YYYY-MM'.
+        """
+        try:
+            # Asegurar que la columna de Fecha existe
+            if 'Fecha' not in df.columns:
+                raise ValueError("No se encontró la columna 'Fecha' en el archivo.")
+
+            # Convertir la columna 'Fecha' a datetime (si no lo es)
+            df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
+
+            # Extraer el período en formato 'YYYY-MM' de la columna 'Fecha'
+            df['Periodo'] = df['Fecha'].dt.strftime('%Y-%m')
+
+            # Filtrar las filas que coincidan con el período proporcionado
+            df_filtered = df[df['Periodo'] == period].copy()
+
+            # Eliminar la columna 'Periodo' ya que no es necesaria en el archivo final
+            df_filtered.drop(columns=['Periodo'], inplace=True)
+
+
+            df_filtered['Fecha'] = pd.to_datetime(df_filtered['Fecha'], errors='coerce').dt.strftime('%d/%m/%Y')
+
+            return df_filtered
+
+        except Exception as e:
+            print(f"Error al filtrar por período: {str(e)}")
+            raise
 
     # Función para guardar los datos limpiados
     def saveCleanedData(self, df_cleaned, filePath):
