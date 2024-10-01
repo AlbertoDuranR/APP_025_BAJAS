@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request, send_file
 from models.lowModel import LowModel
-from utils.urlFile import UrlFile  # Asegúrate de que la clase esté bien nombrada
+from utils.urlFileUtils import UrlFile  # Asegúrate de que la clase esté bien nombrada
 import os
 
 low = Blueprint('low', __name__)
