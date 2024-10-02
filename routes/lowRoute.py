@@ -41,7 +41,24 @@ def upload():
         # Limpiar el archivo para Acepta y filtrar por el período
         return model.fileCleanup(file_path, period)
        
-
     except Exception as e:
         # Manejo de errores durante el proceso de carga de archivos
         return responseBuilder.error(f'Ocurrió un error al procesar el archivo: {str(e)}')
+
+
+# Procesar archivos
+@low.route('/processFile', methods=['POST'])
+def processFile():
+    
+    url_folder = request.form.get('url_folder')
+
+    if not url_folder:
+        return responseBuilder.error('No se especificó una URL válida')
+    
+    try:
+
+        return model.createFileAcepta(url_folder)
+
+    except Exception as e:
+        # Manejo de errores durante el proceso de procesamiento
+        return responseBuilder.error(f'Ocurrió un error al procesar los archivos: {str(e)}')

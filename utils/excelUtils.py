@@ -36,7 +36,6 @@ class excelUtils:
             # Eliminar la columna 'Periodo' ya que no es necesaria en el archivo final
             df_filtered.drop(columns=['Periodo'], inplace=True)
 
-
             df_filtered['Fecha'] = pd.to_datetime(df_filtered['Fecha'], errors='coerce').dt.strftime('%d/%m/%Y')
 
             return df_filtered
