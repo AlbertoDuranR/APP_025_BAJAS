@@ -3,12 +3,14 @@ from flask_cors import CORS
 
 # importamos las rutas
 from routes.lowRoute import low
+from routes.sunatRoutes import sunat
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 # registramos los Blueprints
 app.register_blueprint(low, url_prefix='/low')
+app.register_blueprint(sunat, url_prefix='/sunat')
 
 # Definir una ruta de redireccionamiento por defecto a '/low'
 @app.route('/')

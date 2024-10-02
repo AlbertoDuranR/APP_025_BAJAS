@@ -66,3 +66,6 @@ class LowModel:
 
         except Exception as e:
             return responseBuilder.error(f'Error al crear los archivos SUNAT: {str(e)}')
+    
+    def validatSunat(self, folder_path):
+        pass
