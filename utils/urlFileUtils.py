@@ -25,7 +25,7 @@ class UrlFile:
             os.makedirs(aceptaFolder, exist_ok=True)
             
             # Crear subcarpeta 'txt' dentro de la carpeta principal
-            txtFolder = os.path.join(newFolderPath, 'txt')
+            txtFolder = os.path.join(newFolderPath, 'sunat')
             os.makedirs(txtFolder, exist_ok=True)
         
         except Exception as e:

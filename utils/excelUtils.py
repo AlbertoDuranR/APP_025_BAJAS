@@ -1,6 +1,7 @@
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
+import os
 
 class excelUtils:
     # Función para limpiar el archivo Excel
@@ -64,3 +65,46 @@ class excelUtils:
 
         # Guardar el archivo con el formato aplicado
         wb.save(filePath)
+
+    # Generar Archivo para Acepta
+    def process_excel_file(self, filePath):
+        # Leer el archivo Excel y procesar las columnas
+        df = pd.read_excel(filePath, dtype=str)
+        df['Serie1-Serie2'] = df['Serie1'] + '-' + df['Serie2']
+        df['Fecha'] = pd.to_datetime(df['Fecha'], dayfirst=True, errors='coerce').dt.strftime('%Y-%m-%d')
+        df_acepta = df[['TipoDocumento', 'Serie1-Serie2', 'Fecha']].copy()
+        df_acepta.loc[:, 'Error'] = 'Error en Sistema'
+        return df_acepta
+
+
+    def get_output_directory(self, filePath):
+        # Obtener la ruta de la carpeta 'acepta' (ya existente)
+        output_dir = os.path.join(os.path.dirname(filePath), 'acepta')
+        return output_dir
+    
+
+    def split_and_save_csv(self, df_acepta, output_dir, rows_per_file=45):
+        # Dividir el DataFrame en partes y guardar en archivos CSV
+        num_parts = (len(df_acepta) // rows_per_file) + (1 if len(df_acepta) % rows_per_file != 0 else 0)
+        for i in range(num_parts):
+            part_df = df_acepta.iloc[i * rows_per_file:(i + 1) * rows_per_file]
+            output_path = os.path.join(output_dir, f'acepta_{i + 1}.csv')
+            part_df.to_csv(output_path, sep=';', index=False, header=False)
+        return num_parts
+    
+    # Generar archivo para sunat
+    def process_excel_file_sunat(self, filePath):
+        df = pd.read_excel(filePath, dtype=str)
+        df_sunat = df[['Empresa', 'TipoDocumento', 'Serie1', 'Serie2', 'Fecha', 'Importe Total']].copy()
+        return df_sunat
+
+    def get_output_directory_sunat(self, filePath):
+        return os.path.join(os.path.dirname(filePath), 'sunat')
+
+    def split_and_save_txt(self, df_sunat, output_dir, rows_per_file=45):
+        num_parts = (len(df_sunat) // rows_per_file) + (1 if len(df_sunat) % rows_per_file != 0 else 0)
+        for i in range(num_parts):
+            part_df = df_sunat.iloc[i * rows_per_file:(i + 1) * rows_per_file]
+            output_path = os.path.join(output_dir, f'sunat_{i + 1}.txt')
+            part_df.to_csv(output_path, sep='|', index=False, header=False)
+        return num_parts

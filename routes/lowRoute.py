@@ -56,9 +56,24 @@ def processFile():
         return responseBuilder.error('No se especificó una URL válida')
     
     try:
+        # Procesar archivos Acepta
+        acepta_response = model.createFileAcepta(url_folder).get_json()
+        if not acepta_response['success']:
+            return responseBuilder.error(acepta_response['message'])
 
-        return model.createFileAcepta(url_folder)
+        # Procesar archivos Sunat
+        sunat_response = model.createFileSunat(url_folder).get_json()
+        if not sunat_response['success']:
+            return responseBuilder.error(sunat_response['message'])
+
+        # Combinar respuestas de éxito
+        combined_data = {
+            'acepta_folder': acepta_response['data']['folder_path'],
+            'sunat_folder': sunat_response['data']['folder_path']
+        }
+
+        return responseBuilder.success('Archivos Acepta y SUNAT creados correctamente.', combined_data)
 
     except Exception as e:
-        # Manejo de errores durante el proceso de procesamiento
         return responseBuilder.error(f'Ocurrió un error al procesar los archivos: {str(e)}')
+

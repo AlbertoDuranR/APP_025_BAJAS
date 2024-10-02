@@ -35,40 +35,34 @@ class LowModel:
     # crear archivo acepta
     def createFileAcepta(self, filePath):
         try:
-            # 1. Leer el archivo Excel
-            df = pd.read_excel(filePath, dtype=str)
+            # 1. Leer y procesar el archivo Excel
+            df_acepta = self.excel.process_excel_file(filePath)
 
-            # 2. Crear una nueva columna 'Serie1-Serie2'
-            df['Serie1-Serie2'] = df['Serie1'] + '-' + df['Serie2']
+            # 2. Asumir que la carpeta 'acepta' ya existe
+            output_dir = self.excel.get_output_directory(filePath)
 
-            # 3. Asegurarse de que la columna Fecha esté en el formato adecuado (YYYY-MM-DD)
-            df['Fecha'] = pd.to_datetime(df['Fecha'], dayfirst=True, errors='coerce').dt.strftime('%Y-%m-%d')
+            # 3. Dividir y guardar en archivos CSV 45 items
+            num_parts = self.excel.split_and_save_csv(df_acepta, output_dir)
 
-            # 4. Seleccionar las columnas en el orden adecuado y crear una copia
-            df_acepta = df[['TipoDocumento', 'Serie1-Serie2', 'Fecha']].copy()
-
-            # 5. Usar .loc para agregar una nueva columna con el valor constante "Error en Sistema"
-            df_acepta.loc[:, 'Error'] = 'Error en Sistema'
-
-            # 6. Crear la carpeta 'acepta' dentro de la misma ruta de `filePath`
-            output_dir = os.path.join(os.path.dirname(filePath), 'acepta')
-            os.makedirs(output_dir, exist_ok=True)
-
-            # 7. Dividir el DataFrame en partes de 45 filas
-            num_parts = (len(df_acepta) // 45) + (1 if len(df_acepta) % 45 != 0 else 0)
-            
-            # 8. Guardar cada parte como un archivo CSV separado por ';'
-            for i in range(num_parts):
-                part_df = df_acepta.iloc[i * 45:(i + 1) * 45]
-                output_path = os.path.join(output_dir, f'acepta_{i + 1}.csv')
-                part_df.to_csv(output_path, sep=';', index=False, header=False)
-
-            # Retornar éxito y ruta de la carpeta generada
-            return {'success': True, 'message': f'{num_parts} archivos Acepta creados correctamente.', 'folder_path': output_dir}
+            return responseBuilder.success(f'{num_parts} archivos Acepta creados correctamente.', {'folder_path': output_dir})
 
         except Exception as e:
-            return {'success': False, 'message': f'Error al crear los archivos Acepta: {str(e)}'}
+            return responseBuilder.error(f'Error al crear los archivos Acepta: {str(e)}')
+
 
     # crear archivo sunat
-    def createFileSunat(self, urlFile):
-        pass
+    def createFileSunat(self, filePath):
+        try:
+            # 1. Leer y procesar el archivo Excel
+            df_sunat = self.excel.process_excel_file_sunat(filePath)
+
+            # 2. Obtener la carpeta 'sunat' ya existente
+            output_dir = self.excel.get_output_directory_sunat(filePath)
+
+            # 3. Dividir y guardar en archivos TXT
+            num_parts = self.excel.split_and_save_txt(df_sunat, output_dir)
+
+            return responseBuilder.success(f'{num_parts} archivos SUNAT creados correctamente.', {'folder_path': output_dir})
+
+        except Exception as e:
+            return responseBuilder.error(f'Error al crear los archivos SUNAT: {str(e)}')
