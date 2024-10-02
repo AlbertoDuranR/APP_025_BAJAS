@@ -1,4 +1,5 @@
 from utils.excelUtils import excelUtils
+from utils.responseBuilder import responseBuilder
 
 class LowModel:
 
@@ -19,12 +20,12 @@ class LowModel:
             # 4. Aplicar formato de "Texto" a todas las celdas
             self.excel.applyTextFormat(filePath)
 
-            # print(f"Archivo {filePath} limpiado, filtrado y formateado correctamente.")
-            return {'success': True, 'message': 'Archivo limpiado, filtrado y formateado correctamente.'}
+            # devolver el mensaje de correcto y la ruta
+            return responseBuilder.success('Archivo creado correctamente', {'file_path': filePath})
         
         except Exception as e:
             # print(f"Error al limpiar y filtrar el archivo: {str(e)}")
-            return {'success': False, 'message': f'Error al limpiar y filtrar el archivo: {str(e)}'}
+            return responseBuilder.error(f'Error al limpiar y filtrar el archivo: {str(e)}')
 
     # crear archivo acepta
     def createFileAcepta(self, urlFile):

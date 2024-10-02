@@ -1,11 +1,13 @@
-from flask import Blueprint, jsonify, render_template, request, send_file
+from flask import Blueprint, render_template, request, send_file
 from models.lowModel import LowModel
-from utils.urlFileUtils import UrlFile  # Asegúrate de que la clase esté bien nombrada
+from utils.urlFileUtils import UrlFile
+from utils.responseBuilder import responseBuilder  # Asegúrate de importar la clase correcta
+
 import os
 
 low = Blueprint('low', __name__)
 
-# Inicializar el objeto urlFile
+# Inicializar el objeto urlFile y LowModel
 urlFile = UrlFile()
 model = LowModel()
 
@@ -23,8 +25,10 @@ def upload():
     period = request.form.get('period')
 
     if not file:
-        return jsonify({'success': False, 'message': 'No se cargó ningún archivo', 'data': None})
+        return responseBuilder.error('No se cargó ningún archivo')
 
+    if not period:
+        return responseBuilder.error('No se especificó un período')
 
     try:
         # Crear la carpeta para almacenar el archivo
@@ -34,22 +38,10 @@ def upload():
         file_path = os.path.join(upload_folder, file.filename)
         file.save(file_path)
 
-        # crear el archivo para acepta
-        responseClean = model.fileCleanup(file_path, period)
-        if responseClean['success'] == False:
-            return responseClean
-        
-        # Retornar respuesta exitosa
-        return jsonify({
-            'success': True,
-            'message': 'Archivo cargado correctamente',
-            'data': {'file_path': file_path}
-        })
+        # Limpiar el archivo para Acepta y filtrar por el período
+        return model.fileCleanup(file_path, period)
+       
 
     except Exception as e:
         # Manejo de errores durante el proceso de carga de archivos
-        return jsonify({
-            'success': False,
-            'message': f'Ocurrió un error al procesar el archivo: {str(e)}',
-            'data': None
-        })
+        return responseBuilder.error(f'Ocurrió un error al procesar el archivo: {str(e)}')
