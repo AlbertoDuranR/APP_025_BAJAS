@@ -50,18 +50,24 @@ class LowModel:
             # 5. Usar .loc para agregar una nueva columna con el valor constante "Error en Sistema"
             df_acepta.loc[:, 'Error'] = 'Error en Sistema'
 
-            # 6. Renombrar las columnas para coincidir con el formato solicitado
-            df_acepta.columns = ['TipoDocumento', 'Serie1-Serie2', 'Fecha', 'Error']
+            # 6. Crear la carpeta 'acepta' dentro de la misma ruta de `filePath`
+            output_dir = os.path.join(os.path.dirname(filePath), 'acepta')
+            os.makedirs(output_dir, exist_ok=True)
 
-            # 7. Guardar el DataFrame como un archivo CSV separado por ;
-            output_path = os.path.splitext(filePath)[0] + '_acepta.csv'
-            df_acepta.to_csv(output_path, sep=';', index=False, header=False)
+            # 7. Dividir el DataFrame en partes de 45 filas
+            num_parts = (len(df_acepta) // 45) + (1 if len(df_acepta) % 45 != 0 else 0)
+            
+            # 8. Guardar cada parte como un archivo CSV separado por ';'
+            for i in range(num_parts):
+                part_df = df_acepta.iloc[i * 45:(i + 1) * 45]
+                output_path = os.path.join(output_dir, f'acepta_{i + 1}.csv')
+                part_df.to_csv(output_path, sep=';', index=False, header=False)
 
-            # Retornar éxito y ruta del archivo generado
-            return {'success': True, 'message': 'Archivo Acepta creado correctamente.', 'file_path': output_path}
+            # Retornar éxito y ruta de la carpeta generada
+            return {'success': True, 'message': f'{num_parts} archivos Acepta creados correctamente.', 'folder_path': output_dir}
 
         except Exception as e:
-            return {'success': False, 'message': f'Error al crear el archivo Acepta: {str(e)}'}
+            return {'success': False, 'message': f'Error al crear los archivos Acepta: {str(e)}'}
 
     # crear archivo sunat
     def createFileSunat(self, urlFile):
