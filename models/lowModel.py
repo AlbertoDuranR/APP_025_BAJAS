@@ -41,16 +41,19 @@ class LowModel:
             # 2. Crear una nueva columna 'Serie1-Serie2'
             df['Serie1-Serie2'] = df['Serie1'] + '-' + df['Serie2']
 
-            # 3. Seleccionar las columnas en el orden adecuado y crear una copia
+            # 3. Asegurarse de que la columna Fecha esté en el formato adecuado (YYYY-MM-DD)
+            df['Fecha'] = pd.to_datetime(df['Fecha'], dayfirst=True, errors='coerce').dt.strftime('%Y-%m-%d')
+
+            # 4. Seleccionar las columnas en el orden adecuado y crear una copia
             df_acepta = df[['TipoDocumento', 'Serie1-Serie2', 'Fecha']].copy()
 
-            # 4. Usar .loc para agregar una nueva columna con el valor constante "Error en Sistema"
+            # 5. Usar .loc para agregar una nueva columna con el valor constante "Error en Sistema"
             df_acepta.loc[:, 'Error'] = 'Error en Sistema'
 
-            # 5. Renombrar las columnas para coincidir con el formato solicitado
+            # 6. Renombrar las columnas para coincidir con el formato solicitado
             df_acepta.columns = ['TipoDocumento', 'Serie1-Serie2', 'Fecha', 'Error']
 
-            # 6. Guardar el DataFrame como un archivo CSV separado por ;
+            # 7. Guardar el DataFrame como un archivo CSV separado por ;
             output_path = os.path.splitext(filePath)[0] + '_acepta.csv'
             df_acepta.to_csv(output_path, sep=';', index=False, header=False)
 
