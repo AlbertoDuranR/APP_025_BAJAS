@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, send_file
 from utils.responseBuilder import responseBuilder
 from models.sunatModel import SunatValidator
-from utils.statusSunatUtil import estado_cp_map, estado_ruc_map, cond_domi_ruc_map
 
 sunat = Blueprint('sunat', __name__)
 
@@ -15,9 +14,8 @@ def validate():
         # Procesar archivos en la ruta proporcionada
         response = model.procesarArchivos(folder_path)
 
+        # convertir a json
         response = response.to_dict(orient='records')
-
-        # print(response)
 
         if response:  # Si hay respuesta
             # Retornar la respuesta JSON correctamente
