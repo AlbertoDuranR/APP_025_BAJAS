@@ -16,6 +16,8 @@ const elementos = {
 };
 
 let carpetaPrincipal = null;
+let carpetaAcepta = null;
+let carpetaSunat = null;
 
 $(document).ready(function () {
     // botones deshabiliados
@@ -60,7 +62,6 @@ async function cargarArchivo() {
 
     // Petición POST
     let response = await postRequest("/low/upload", dataForm);
-    console.log(response);
 
     // validar respuesta
     if (response.success){
@@ -73,6 +74,51 @@ async function cargarArchivo() {
     }
 }
 
+
+// Función paso 2 - Procesar archivo
+async function procesarArchivo() {
+    // Añadir a FormData
+    let dataForm = new FormData();
+    dataForm.append("url_folder", carpetaPrincipal);
+
+    // Petición POST
+    let response = await postRequest("/low/processFile", dataForm);
+
+    console.log(response);
+    
+
+    // validar respuesta
+    if (response.success){
+        let mensaje = response.data.acepta_response.message + "<br>" + response.data.sunat_response.message; 
+        carpetaAcepta = response.data.acepta_response.folder_path;
+        carpetaSunat = response.data.sunat_response.folder_path;
+
+        texto("Éxito", mensaje, "success")
+        updateProgressBar(elementos.barraProgresoProcesar, 100)
+        enableButton(elementos.botonBaja)
+    }else{
+        error("Error", response.message)
+    }
+}
+
+// Funcion pase 3 - Dar de baja en acepta
+// async function bajaArchivo() {
+//     // Añadir a FormData
+//     let dataForm = new FormData();
+//     dataForm.append("url_folder", carpetaAcepta);
+
+//     // Petición POST
+//     let response = await postRequest("/low/bajaAcepta", dataForm);
+
+//     // validar respuesta
+//     if (response.success){
+//         texto("Éxito", response.message, "success")
+//         updateProgressBar(elementos.barraProgresoBaja, 100)
+//         enableButton(elementos.botonValidar)
+//     }else{
+//         error("Error", response.message)
+//     }
+// }
 
 
 // barra de progeso

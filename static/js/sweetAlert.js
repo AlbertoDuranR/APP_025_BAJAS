@@ -21,8 +21,16 @@ function error(titulo, texto) {
 function texto(titulo, texto, icono) {
     Swal.fire({
         title: titulo || "Información",
-        text: texto || "Aquí hay más detalles de la operación.",
+        html: texto || "Aquí hay más detalles de la operación.",
         icon: icono || "info",
         confirmButtonText: "OK"
     });
 }
+
+
+// cons
+// success
+// error
+// warning
+// info
+// question
