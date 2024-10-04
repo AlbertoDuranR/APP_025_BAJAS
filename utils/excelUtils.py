@@ -83,14 +83,68 @@ class excelUtils:
         return output_dir
     
 
-    def split_and_save_csv(self, df_acepta, output_dir, rows_per_file=45):
-        # Dividir el DataFrame en partes y guardar en archivos CSV
-        num_parts = (len(df_acepta) // rows_per_file) + (1 if len(df_acepta) % rows_per_file != 0 else 0)
-        for i in range(num_parts):
-            part_df = df_acepta.iloc[i * rows_per_file:(i + 1) * rows_per_file]
-            output_path = os.path.join(output_dir, f'acepta_{i + 1}.csv')
-            part_df.to_csv(output_path, sep=';', index=False, header=False)
-        return num_parts
+    def split_and_save_csv_by_day(self, df_acepta, output_dir, rows_per_file=45):
+
+        print("Procesando archivos CSV...")
+        print(output_dir)
+
+        print("Mostrando DataFrame original:")
+        print(df_acepta)
+
+        try:
+            # Imprimir los valores originales de la columna 'Fecha'
+            print("Valores originales en la columna 'Fecha':")
+            print(df_acepta['Fecha'].unique())
+            
+            # Eliminar espacios en blanco o caracteres erróneos en las fechas
+            df_acepta['Fecha'] = df_acepta['Fecha'].str.strip()
+
+            # Convertir las fechas con el formato correcto: yyyy-mm-dd
+            print("Convirtiendo fechas...")
+            df_acepta['Fecha'] = pd.to_datetime(df_acepta['Fecha'], format='%Y-%m-%d', errors='coerce')
+            print("Fechas convertidas:")
+            print(df_acepta['Fecha'])
+
+            # Verificar si hubo algún error al convertir las fechas
+            if df_acepta['Fecha'].isnull().any():
+                print("Error en la conversión de fechas, algunas fechas no se pudieron convertir.")
+                raise ValueError("Algunas fechas no se pudieron convertir correctamente.")
+
+            # Agrupar por la columna 'Fecha'
+            print("Agrupando por fecha...")
+            grouped = df_acepta.groupby('Fecha')
+            print(f"Grupos creados: {len(grouped)}")
+
+            # Para llevar la cuenta de cuántos archivos se crean en total
+            total_files_created = 0
+
+            print("Creando archivos CSV...")
+            # Para cada grupo de fecha, dividir y guardar en archivos CSV de 45 filas
+            for fecha, group in grouped:
+                print(f"Procesando grupo: {fecha}, total de filas: {len(group)}")
+                num_parts = (len(group) // rows_per_file) + (1 if len(group) % rows_per_file != 0 else 0)
+                for i in range(num_parts):
+                    part_df = group.iloc[i * rows_per_file:(i + 1) * rows_per_file]
+                    # Crear el nombre del archivo basado en la fecha y el índice de la parte
+                    formatted_date = fecha.strftime('%Y-%m-%d')
+                    output_path = os.path.join(output_dir, f'acepta_{formatted_date}_parte_{i + 1}.csv')
+                    print(f"Guardando archivo: {output_path}")
+                    part_df.to_csv(output_path, sep=';', index=False, header=False)
+                    total_files_created += 1
+
+            return total_files_created
+
+        except FileNotFoundError as e:
+            return f"Error: Archivo o directorio no encontrado - {str(e)}"
+        
+        except ValueError as e:
+            return f"Error: {str(e)}"
+        
+        except Exception as e:
+            print(f"Error inesperado: {str(e)}")
+            return f"Error inesperado: {str(e)}"
+
+
     
     # Generar archivo para sunat
     def process_excel_file_sunat(self, filePath):

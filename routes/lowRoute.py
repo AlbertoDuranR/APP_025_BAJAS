@@ -45,7 +45,7 @@ def upload():
         return responseBuilder.error(f'Ocurrió un error al procesar el archivo: {str(e)}')
 
 
-# Procesar archivos
+
 @low.route('/processFile', methods=['POST'])
 def processFile():
     
@@ -65,14 +65,21 @@ def processFile():
         if not sunat_response['success']:
             return responseBuilder.error(sunat_response['message'])
 
-        # Combinar respuestas de éxito
+        # Combinar respuestas de éxito usando diccionarios
         combined_data = {
-            'acepta_folder': acepta_response['data']['folder_path'],
-            'sunat_folder': sunat_response['data']['folder_path']
+            'acepta_response': {
+                'folder_path': acepta_response['data']['folder_path'], 
+                'message': acepta_response['message']
+            },
+            'sunat_response': {
+                'folder_path': sunat_response['data']['folder_path'], 
+                'message': sunat_response['message']
+            }
         }
 
         return responseBuilder.success('Archivos Acepta y SUNAT creados correctamente.', combined_data)
 
     except Exception as e:
         return responseBuilder.error(f'Ocurrió un error al procesar los archivos: {str(e)}')
+
 

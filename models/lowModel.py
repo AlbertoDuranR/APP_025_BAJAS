@@ -42,7 +42,7 @@ class LowModel:
             output_dir = self.excel.get_output_directory(filePath)
 
             # 3. Dividir y guardar en archivos CSV 45 items
-            num_parts = self.excel.split_and_save_csv(df_acepta, output_dir)
+            num_parts = self.excel.split_and_save_csv_by_day(df_acepta, output_dir)
 
             return responseBuilder.success(f'{num_parts} archivos Acepta creados correctamente.', {'folder_path': output_dir})
 
