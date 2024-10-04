@@ -166,6 +166,28 @@
   </div>
 
 </div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img src="{{ url_for('static', filename='images/logos/prealoader.jpg') }}" alt="Robot" class="mb-3" style="width: 450px;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="mt-3" id="loading-text">Cargando...</h5>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
 {% endblock %}
 
 
