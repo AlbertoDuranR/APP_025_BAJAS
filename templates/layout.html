@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <!--  Body Wrapper -->
+  <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
     <!-- Sidebar Start -->
@@ -68,7 +68,15 @@
     <script src="{{ url_for('static', filename='js/sidebarmenu.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
     <script src="{{ url_for('static', filename='libs/simplebar/dist/simplebar.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.1/dist/sweetalert2.all.min.js"></script>
+
     <script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/request.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sweetAlert.js') }}"></script>
+
+    <!-- Scripts Individuales -->
+    {% block apps %}{% endblock %}
 
 </body>
 
