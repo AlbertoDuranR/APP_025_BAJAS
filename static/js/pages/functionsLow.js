@@ -144,6 +144,55 @@ async function bajaArchivo() {
     }
 }
 
+// Función paso 4 - Validar archivo
+async function validarArchivo() {
+    // Añadir a FormData
+    let dataForm = new FormData();
+
+    let tempCarpeta = "static\\\\uploads\\\\2024_10_07_12_28_54\\sunat";
+    dataForm.append("folder_path", tempCarpeta);
+
+    // Petición POST
+    let response = await postRequest("/sunat/validate", dataForm);
+
+    // validar respuesta
+    if (response.success) {
+        texto("Éxito", response.message, "success");
+        // console.log(response.data);
+
+        // Limpiar el contenido actual de la tabla
+        $("#tableBody").empty();
+
+        // Llenar los datos en la tabla
+        response.data.forEach((item) => {
+            let row = `
+            <tr>
+                <td>${item.numRuc}</td>
+                <td>${item.codComp}</td>
+                <td>${item.numeroSerie}-${item.numero}</td>
+                <td>${item.fechaEmision}</td>
+                <td>${item.monto}</td>
+                <td>${item.estadoCp}</td>
+                <td>${item.estadoRuc}</td>
+                <td>${item.condDomiRuc}</td>
+                <td>${item.observaciones || ''}</td>
+            </tr>`;
+            $("#tableBody").append(row);
+        });
+
+        // Inicializar DataTables (asegúrate de que solo se inicialice una vez)
+        if (!$.fn.DataTable.isDataTable('#tableValidate')) {
+            $('#tableValidate').DataTable();
+        } else {
+            $('#tableValidate').DataTable().clear().draw();
+        }
+
+    } else {
+        error("Error", response.message);
+    }
+}
+
+
 
 // barra de progeso
 function updateProgressBar(progressBarId, progress) {

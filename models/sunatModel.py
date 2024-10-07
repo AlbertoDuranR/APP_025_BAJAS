@@ -23,7 +23,8 @@ class SunatValidator:
         }
         self.cookies = {
             'f5_cspm': '1234',
-            'ITCONSULTAUNIFICADASESSION': 'b9VOFNPorbqOn2hmtBWL1LDsz61T8mUam47dgNzl6UqQSbW5sv19I87S3COpvxONKLd6ARn_6gnP-yePUknIy7yHtYlVaVKb3gPq4A_cLIbSSm2Q0zWXQYZ1s-m8Frf7R_uz1Hhspyv5sMt1dGCllRjH2D5_volCKaRdXEYQTxwQ91lfcKGIn7ApXZ_F0iIm77pwv2cScFNRfgp_wAdaP5RkYuXAeje-Fi5UJPOAC7nu2KRK9PEh8YFq2xRMghvK!128106772!527021124'
+            'ITCONSULTAUNIFICADASESSION' : 'sthofzceYC-cjUfRgkmGxcFIhgUSnBa7Ya51x39HkQzo5gKv1sw5SGyS8el0yXgMKrB2UciyXS1x1iWAfasC0UMIbnncQXrgfqfvpyHA-QtymY-3bp_QxAVTpb3aSu19qmm2VE6pWt5yq1xKVrzoCH3tjq-V0yU6r0UpVT7ZIDlSYFHie5EeZkQPy1mo3qtZLbTMLzES9jVE3dFPrV6y64l6Rh1aAv5FhvRvzrzFpfJIfM1tx0RsVPnLx0t9z-TZ!-459837678!-754705400'
+
         }
 
     def leerArchivo(self, file_path: str) -> bytes:
@@ -77,6 +78,7 @@ class SunatValidator:
                
         if isinstance(respuesta, str):
             respuesta_json = json.loads(respuesta)
+            # print(respuesta_json)
             if respuesta_json.get('rpta') == 1:
                 data = respuesta_json['lista']
                 df = self.jsonADataframe(data)

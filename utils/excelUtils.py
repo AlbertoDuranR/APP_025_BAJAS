@@ -2,6 +2,7 @@ import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
 import os
+import numpy as np
 
 class excelUtils:
     # Función para limpiar el archivo Excel
@@ -135,9 +136,15 @@ class excelUtils:
         return os.path.join(os.path.dirname(filePath), 'sunat')
 
     def split_and_save_txt(self, df_sunat, output_dir, rows_per_file=45):
+        # Eliminar filas que estén completamente vacías o tengan solo espacios
+        df_sunat = df_sunat.dropna(how='all').apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+        df_sunat = df_sunat.replace('', np.nan).dropna(how='any')
+        
         num_parts = (len(df_sunat) // rows_per_file) + (1 if len(df_sunat) % rows_per_file != 0 else 0)
+        
         for i in range(num_parts):
             part_df = df_sunat.iloc[i * rows_per_file:(i + 1) * rows_per_file]
             output_path = os.path.join(output_dir, f'sunat_{i + 1}.txt')
             part_df.to_csv(output_path, sep='|', index=False, header=False)
+        
         return num_parts
