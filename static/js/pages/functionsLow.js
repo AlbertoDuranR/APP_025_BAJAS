@@ -370,16 +370,21 @@ function textoAcepta(titulo, texto, icono) {
 
 async function descargarArchivos() {
     // Definir la carpeta que se enviará en el request
-    let url_folder = 'static\\\\uploads\\\\2024_10_04_09_48_29\\acepta';  // Aquí debes ajustar la carpeta deseada
+    let url_folder = 'static/uploads/2024_10_09_16_59_00';  // Ajusta la carpeta deseada
 
     try {
+        // Crear un objeto FormData para enviar la información
+        let formData = new FormData();
+        formData.append('url_folder', url_folder);  // Añadir la ruta de la carpeta
+
         // Realizar la solicitud POST usando Axios
         const response = await axios({
             url: '/low/downloadFiles',   // La URL de tu API
             method: 'POST',
+            data: formData,              // Enviar el objeto FormData
             responseType: 'blob',        // Indicamos que la respuesta es un archivo binario
-            data: {
-                url_folder: url_folder   // Enviar la ruta de la carpeta como un parámetro en el cuerpo de la solicitud
+            headers: {
+                'Content-Type': 'multipart/form-data'
             }
         });
 
@@ -387,9 +392,12 @@ async function descargarArchivos() {
         const blob = new Blob([response.data], { type: 'application/zip' });
 
         // Obtener el nombre del archivo desde los headers o asignar un nombre por defecto
-        const filename = response.headers['content-disposition']
-            ? response.headers['content-disposition'].split('filename=')[1]
-            : 'archivo.zip';
+        const contentDisposition = response.headers['content-disposition'];
+        let filename = 'archivo.zip';  // Nombre por defecto
+
+        if (contentDisposition && contentDisposition.includes('filename=')) {
+            filename = contentDisposition.split('filename=')[1].replace(/['"]/g, '');
+        }
 
         // Crear un enlace temporal para descargar el archivo
         const link = document.createElement('a');

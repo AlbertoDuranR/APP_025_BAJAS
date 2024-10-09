@@ -5,10 +5,6 @@ import zipfile
 
 import pandas as pd
 import os
-import logging
-
-# Configurar el logger
-logging.basicConfig(level=logging.INFO)
 
 class LowModel:
 
@@ -94,7 +90,9 @@ class LowModel:
 
             # Verificar si el archivo ZIP fue creado exitosamente
             if os.path.exists(zip_path):
-                return jsonify({"message": "correcto"})  # ZIP creado correctamente
+                # retonrar el archio
+                return send_file(zip_path, as_attachment=True)
+        
             else:
                 return jsonify({"message": "falso"})  # No se pudo crear el ZIP
 
