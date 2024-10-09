@@ -38,7 +38,7 @@ def upload():
         file.save(file_path)
 
         # Limpiar el archivo para Acepta y filtrar por el período
-        return model.fileCleanup(file_path, period)
+        return model.fileCleanup(upload_folder, file_path, period)
        
     except Exception as e:
         # Manejo de errores durante el proceso de carga de archivos
@@ -83,3 +83,18 @@ def processFile():
         return responseBuilder.error(f'Ocurrió un error al procesar los archivos: {str(e)}')
 
 
+
+
+@low.route('/downloadFiles', methods=['POST'])
+def downloadFiles():
+    url_folder = request.form.get('url_folder')
+
+    if not url_folder:
+        return responseBuilder.error('No se especificó una URL válida')
+
+    try:
+        # Descargar archivos ZIP
+        return model.downloadFiles(url_folder)
+
+    except Exception as e:
+        return responseBuilder.error(f'Ocurrió un error al descargar los archivos: {str(e)}')

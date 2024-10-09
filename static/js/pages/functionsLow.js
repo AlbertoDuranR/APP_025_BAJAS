@@ -43,6 +43,7 @@ const elementos = {
     barraProgresoCarga: "#barraProgresoCarga",
 
     botonProcesar: "#botonProcesar",
+    botonDescargarArchivos: "#botonDescargarArchivos",
     barraProgresoProcesar: "#barraProgresoProcesar",
 
     botonBaja: "#botonBaja",
@@ -53,6 +54,7 @@ const elementos = {
 };
 
 let carpetaPrincipal = null;
+let archivoPrincipal = null;
 let carpetaAcepta = null;
 let carpetaSunat = null;
 
@@ -70,6 +72,12 @@ $(document).ready(function () {
     $(elementos.botonProcesar).click(function (e) {
         e.preventDefault();
         procesarArchivo();
+    });
+
+    // Evento par descargar archivos
+    $(elementos.botonDescargarArchivos).click(function (e) {
+        e.preventDefault();
+        descargarArchivos();
     });
 
     // Evento para dar de baja archivo acepta
@@ -105,7 +113,9 @@ async function cargarArchivo() {
     // validar respuesta
     if (response.success) {
         correcto("Éxito", response.message)
-        carpetaPrincipal = response.data.file_path;
+        carpetaPrincipal = response.data.upload_folder;
+        archivoPrincipal = response.data.file_path;
+
         numeroFilas = response.data.number_rows;
         $("#numberRows").text(numeroFilas + " Filas");
         updateProgressBar(elementos.barraProgresoCarga, 100)
@@ -120,7 +130,7 @@ async function cargarArchivo() {
 async function procesarArchivo() {
     // Añadir a FormData
     let dataForm = new FormData();
-    dataForm.append("url_folder", carpetaPrincipal);
+    dataForm.append("url_folder", archivoPrincipal);
 
     // Petición POST
     let response = await postRequest("/low/processFile", dataForm);
@@ -355,4 +365,41 @@ function textoAcepta(titulo, texto, icono) {
             location.reload();
         }
     });
+}
+
+
+async function descargarArchivos() {
+    // Definir la carpeta que se enviará en el request
+    let url_folder = 'static\\\\uploads\\\\2024_10_04_09_48_29\\acepta';  // Aquí debes ajustar la carpeta deseada
+
+    try {
+        // Realizar la solicitud POST usando Axios
+        const response = await axios({
+            url: '/low/downloadFiles',   // La URL de tu API
+            method: 'POST',
+            responseType: 'blob',        // Indicamos que la respuesta es un archivo binario
+            data: {
+                url_folder: url_folder   // Enviar la ruta de la carpeta como un parámetro en el cuerpo de la solicitud
+            }
+        });
+
+        // Crear un blob con la respuesta
+        const blob = new Blob([response.data], { type: 'application/zip' });
+
+        // Obtener el nombre del archivo desde los headers o asignar un nombre por defecto
+        const filename = response.headers['content-disposition']
+            ? response.headers['content-disposition'].split('filename=')[1]
+            : 'archivo.zip';
+
+        // Crear un enlace temporal para descargar el archivo
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Error al descargar los archivos:', error);
+        alert('Ocurrió un error al descargar los archivos.');
+    }
 }

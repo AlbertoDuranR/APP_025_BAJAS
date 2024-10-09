@@ -1,8 +1,14 @@
 from utils.excelUtils import excelUtils
 from utils.responseBuilder import responseBuilder
+from flask import send_file, Response, jsonify
+import zipfile
 
 import pandas as pd
 import os
+import logging
+
+# Configurar el logger
+logging.basicConfig(level=logging.INFO)
 
 class LowModel:
 
@@ -10,7 +16,7 @@ class LowModel:
         self.excel = excelUtils()  # Instancia de excelUtils
 
     # limpieza del archivo excel cargado
-    def fileCleanup(self, filePath, period):
+    def fileCleanup(self,upload_folder, filePath, period):
         try:
             # 1. Leer y limpiar el archivo Excel
             df_cleaned = self.excel.cleanExcel(filePath)
@@ -28,7 +34,7 @@ class LowModel:
             num_rows = df_cleaned.shape[0]
 
             # devolver el mensaje de correcto y la ruta
-            return responseBuilder.success('Archivo creado correctamente', {'file_path': filePath, 'number_rows': num_rows})
+            return responseBuilder.success('Archivo creado correctamente', {'upload_folder': upload_folder ,'file_path': filePath, 'number_rows': num_rows})
         
         except Exception as e:
             # print(f"Error al limpiar y filtrar el archivo: {str(e)}")
@@ -70,5 +76,27 @@ class LowModel:
         except Exception as e:
             return responseBuilder.error(f'Error al crear los archivos SUNAT: {str(e)}')
     
-    def validatSunat(self, folder_path):
-        pass
+
+    def downloadFiles(self, folder_path):
+        try:
+            zip_filename = "archivos_sunat.zip"
+            zip_path = os.path.join(folder_path, zip_filename)
+
+            # Crear el archivo ZIP
+            with zipfile.ZipFile(zip_path, 'w') as zipf:
+                for root, dirs, files in os.walk(folder_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        
+                        # Excluir el archivo ZIP de ser añadido al propio ZIP
+                        if file != zip_filename:
+                            zipf.write(file_path, os.path.basename(file_path))
+
+            # Verificar si el archivo ZIP fue creado exitosamente
+            if os.path.exists(zip_path):
+                return jsonify({"message": "correcto"})  # ZIP creado correctamente
+            else:
+                return jsonify({"message": "falso"})  # No se pudo crear el ZIP
+
+        except Exception as e:
+            return jsonify({"message": "falso", "error": str(e)}), 500  # Hubo un error durante el proceso
