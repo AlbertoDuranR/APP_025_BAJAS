@@ -72,7 +72,7 @@ $(document).ready(function () {
         procesarArchivo();
     });
 
-    // Evento para dar de baja archivo
+    // Evento para dar de baja archivo acepta
     $(elementos.botonBaja).click(function (e) {
         e.preventDefault();
         // bajaArchivo();
@@ -80,7 +80,7 @@ $(document).ready(function () {
         bajaArchivo()
     });
 
-    // Evento para validar archivo
+    // Evento para validar archivo sunat
     $(elementos.botonValidar).click(function (e) {
         e.preventDefault();
         validarArchivo();
@@ -106,6 +106,8 @@ async function cargarArchivo() {
     if (response.success) {
         correcto("Éxito", response.message)
         carpetaPrincipal = response.data.file_path;
+        numeroFilas = response.data.number_rows;
+        $("#numberRows").text(numeroFilas + " Filas");
         updateProgressBar(elementos.barraProgresoCarga, 100)
         enableButton(elementos.botonProcesar)
     } else {
@@ -170,8 +172,9 @@ async function validarArchivo() {
     // Añadir a FormData
     let dataForm = new FormData();
 
-    let tempCarpeta = "static\\\\uploads\\\\2024_10_07_12_28_54\\sunat";
-    dataForm.append("folder_path", tempCarpeta);
+    // let tempCarpeta = "static\\\\uploads\\\\2024_10_07_12_28_54\\sunat";
+
+    dataForm.append("folder_path", carpetaSunat);
 
     // Petición POST
     let response = await postRequest("/sunat/validate", dataForm);

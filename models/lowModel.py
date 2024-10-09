@@ -24,8 +24,11 @@ class LowModel:
             # 4. Aplicar formato de "Texto" a todas las celdas
             self.excel.applyTextFormat(filePath)
 
+            # 5. Devolver cantidad de filas filtradas y ruta del archivo
+            num_rows = df_cleaned.shape[0]
+
             # devolver el mensaje de correcto y la ruta
-            return responseBuilder.success('Archivo creado correctamente', {'file_path': filePath})
+            return responseBuilder.success('Archivo creado correctamente', {'file_path': filePath, 'number_rows': num_rows})
         
         except Exception as e:
             # print(f"Error al limpiar y filtrar el archivo: {str(e)}")

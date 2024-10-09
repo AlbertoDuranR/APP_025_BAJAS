@@ -25,7 +25,8 @@ h6 {
         <div class="card-body p-4 text-center">
           <h5 class="card-title fw-semibold mb-4">Cargar Archivo</h5>
           <form>
-            <img src="{{ url_for('static', filename='/images/logos/excel.png') }}" class="mx-auto d-block my-5" alt="" style="width: 70px;">
+            <img src="{{ url_for('static', filename='/images/logos/excel.png') }}" class="mx-auto d-block mt-5 mb-3" alt="" style="width: 70px;">
+            <h5 id="numberRows">0 Filas</h5>
             <input type="file" class="form-control mb-2" id="archivoInput"/>
             <input type="month" name="fecha" class="form-control my-3" id="periodoInput">
             <button class="btn btn-primary w-100" id="botonCargarArchivo">Cargar archivo</button>
