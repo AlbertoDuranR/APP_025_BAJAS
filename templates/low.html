@@ -1,5 +1,21 @@
 {% extends 'layout.html'%}
 
+<style>
+  .table-responsive {
+    overflow-x: auto; /* Para que tenga scroll horizontal si es necesario */
+}
+
+.table th, .table td {
+    white-space: nowrap; /* Evita que las columnas se rompan en varias líneas */
+    text-align: center;   /* Centrar el contenido de las columnas */
+}
+
+h6 {
+    font-size: 0.9rem;  /* Reduce ligeramente el tamaño del texto de los encabezados */
+}
+
+</style>
+
 {% block content %}
 <div class="container my-5">
   <div class="row">
@@ -90,47 +106,62 @@
   <!-- Resultados de las Validaciones -->
   <div class="row">
     <div class="card w-100">
-      <div class="card-body p-4">
-        <h5 class="card-title fw-semibold mb-4">Resultado de las validaciones en Sunat</h5>
-        <div class="table-responsive">
-          <table class="table text-nowrap mb-0 align-middle" id="tableValidate">
-            <thead class="text-dark fs-4">
-              <tr>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Ruc</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Tipo comprobante</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Nro Comprobante</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Fecha Emision</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Importe Total</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Estado comprobante</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Estado contribuyente</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Condicion domicilio</h6></th>
-                <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Observaciones</h6></th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-              <!-- Aquí se llenarán los datos de la tabla -->
-            </tbody>
-         </table>
-         
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Resultado de las validaciones en Sunat</h5>
+            <div class="table-responsive">
+                <table class="table text-nowrap table-striped table-bordered table-hover mb-0 align-middle" id="tableValidate">
+                    <thead class="text-dark fs-4">
+                        <tr>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Ruc</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Tipo Comp.</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Nro Comp.</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Fecha Emision</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Importe Total</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Estado Comp.</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Estado contribuyente</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Condicion domicilio</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Observaciones</h6></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Aquí se llenarán los datos de la tabla -->
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+
 
 </div>
 
 
 
-<!-- Modal -->
-<div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+<!-- Modal Bot Acepta -->
+<div class="modal fade" id="loadingModalAcepta" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-body text-center">
-        <img src="{{ url_for('static', filename='images/logos/prealoader.jpg') }}" alt="Robot" class="mb-3" style="width: 450px;">
+        <img src="{{ url_for('static', filename='images/logos/prealoader_acepta.jpg') }}" alt="Robot" class="mb-3" style="width: 450px;">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
-        <h5 class="mt-3" id="loading-text">Cargando...</h5>
+        <h5 class="mt-3" id="txtLoadingAcepta">Cargando...</h5>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal API Sunat -->
+<div class="modal fade" id="loadingModalSunat" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img src="{{ url_for('static', filename='images/logos/preloader_sunat.jpg') }}" alt="Robot" class="mb-3" style="width: 450px;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="mt-3" id="txtLoadingSunat">Cargando...</h5>
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 // Variables
 
 // Textos que cambiarán dinámicamente
-let textosCarga = [
+let textosCargaAcepta = [
     "Localización de la carpeta...",
     "Identificando archivos...",
     "Iniciando la conexión a Selenium Grid...",
@@ -15,7 +15,25 @@ let textosCarga = [
     "Se evalúan los resultados..."
 ];
 
-let indiceTexto = 0;
+// Textos que cambiarán dinámicamente
+let textosCargaSunat = [
+    "Localización de la carpeta...",
+    "Identificando archivos...",
+    "Iniciando la comunicacion con la Api...",
+
+    // Estos dos se repetirán
+    "Realizando consulta...",
+    "Reintentando consulta...",
+];
+
+let indiceTextoAcepta = 0;
+let indiceTextoSunat = 0;
+
+let modalAcepta = "#loadingModalAcepta"
+let txtLoadingAcepta = "#txtLoadingAcepta"
+
+let modalSunat = "#loadingModalSunat"
+let txtLoadingSunat = "#txtLoadingSunat"
 
 
 const elementos = {
@@ -58,7 +76,7 @@ $(document).ready(function () {
     $(elementos.botonBaja).click(function (e) {
         e.preventDefault();
         // bajaArchivo();
-        mostrarModalCarga()
+        mostrarModalAcepta()
         bajaArchivo()
     });
 
@@ -138,7 +156,7 @@ async function bajaArchivo() {
         
         updateProgressBar(elementos.barraProgresoBaja, 100);
         enableButton(elementos.botonValidar);
-        ocultarModalCarga();
+        ocultarModalAcepta();
     } else {
         error("Error", response.message);
     }
@@ -146,6 +164,9 @@ async function bajaArchivo() {
 
 // Función paso 4 - Validar archivo
 async function validarArchivo() {
+    // nostramos el modal de carga
+    mostrarModalSunat();
+
     // Añadir a FormData
     let dataForm = new FormData();
 
@@ -155,13 +176,20 @@ async function validarArchivo() {
     // Petición POST
     let response = await postRequest("/sunat/validate", dataForm);
 
+    ocultarModalSunat()
+
     // validar respuesta
     if (response.success) {
         texto("Éxito", response.message, "success");
-        // console.log(response.data);
 
         // Limpiar el contenido actual de la tabla
         $("#tableBody").empty();
+
+        // Verificar si la tabla ya fue inicializada con DataTables
+        if ($.fn.DataTable.isDataTable('#tableValidate')) {
+            // Si ya fue inicializada, destruye la tabla y luego vacía su contenido
+            $('#tableValidate').DataTable().clear().destroy();
+        }
 
         // Llenar los datos en la tabla
         response.data.forEach((item) => {
@@ -180,17 +208,29 @@ async function validarArchivo() {
             $("#tableBody").append(row);
         });
 
-        // Inicializar DataTables (asegúrate de que solo se inicialice una vez)
-        if (!$.fn.DataTable.isDataTable('#tableValidate')) {
-            $('#tableValidate').DataTable();
-        } else {
-            $('#tableValidate').DataTable().clear().draw();
-        }
+        // Volver a inicializar DataTables
+        $('#tableValidate').DataTable({
+            responsive: true,  // Hacer la tabla responsive
+            autoWidth: false,  // Deshabilitar el autoajuste de columnas
+            pageLength: 10,    // Muestra 10 registros por página
+            scrollX: true,     // Habilitar scroll horizontal si es necesario
+            lengthMenu: [10, 25, 50, 75, 100],  // Opciones de selección de registros
+            language: {
+                search: "Buscar:",
+                lengthMenu: "Mostrar _MENU_ entradas",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                paginate: {
+                    previous: "Anterior",
+                    next: "Siguiente"
+                }
+            }
+        });
 
     } else {
         error("Error", response.message);
     }
 }
+
 
 
 
@@ -215,35 +255,74 @@ function enableButton(buttonId) {
 
 // Función para iniciar el proceso de carga con cambio de textos
 
-function mostrarModalCarga() {
-    $('#loadingModal').modal('show');
-    iniciarProcesoCarga();
+function mostrarModalAcepta() {
+    $(modalAcepta).modal('show');
+    iniciarProcesoCargaAcepta();
 }
 
-function ocultarModalCarga() {
-    $('#loadingModal').modal('hide');
+function ocultarModalAcepta() {
+    $(modalAcepta).modal('hide');
 }
 
-function iniciarProcesoCarga() {
+
+// Modales para api sunat
+function mostrarModalSunat() {
+    $(modalSunat).modal('show');
+    iniciarProcesoCargaSunat()
+}
+
+function ocultarModalSunat() {
+    $(modalSunat).modal('hide');
+}
+
+function iniciarProcesoCargaAcepta() {
     let intervalo = setInterval(function () {
         // Hacer el texto más grande al comienzo
-        $('#loading-text').css({
+        $(txtLoadingAcepta).css({
             'font-size': '2rem',  // Aumentar el tamaño
             'transition': 'font-size 0.5s ease'  // Transición suave
         });
 
         // Cambiar el texto
-        $('#loading-text').text(textosCarga[indiceTexto]);
-        indiceTexto++;
+        $(txtLoadingAcepta).text(textosCargaAcepta[indiceTextoAcepta]);
+        indiceTextoAcepta++;
 
         // Si llegamos al final del array, repetimos los dos últimos textos
-        if (indiceTexto >= textosCarga.length) {
-            indiceTexto = 6; // Reiniciamos el índice para repetir los últimos dos pasos
+        if (indiceTextoAcepta >= textosCargaAcepta.length) {
+            indiceTextoAcepta = 6; // Reiniciamos el índice para repetir los últimos dos pasos
         }
 
         // Después de 1 segundo, devolver el tamaño al normal
         setTimeout(function () {
-            $('#loading-text').css({
+            $(txtLoadingAcepta).css({
+                'font-size': '1rem',  // Tamaño normal
+                'transition': 'font-size 0.5s ease'  // Transición suave
+            });
+        }, 1000);  // Después de 1 segundo
+
+    }, 4000); // Cambiar texto cada 4 segundos
+}
+
+function iniciarProcesoCargaSunat() {
+    let intervalo = setInterval(function () {
+        // Hacer el texto más grande al comienzo
+        $(txtLoadingSunat).css({
+            'font-size': '2rem',  // Aumentar el tamaño
+            'transition': 'font-size 0.5s ease'  // Transición suave
+        });
+
+        // Cambiar el texto
+        $(txtLoadingSunat).text(textosCargaSunat[indiceTextoSunat]);
+        indiceTextoSunat++;
+
+        // Si llegamos al final del array, repetimos los dos últimos textos
+        if (indiceTextoSunat >= textosCargaSunat.length) {
+            indiceTextoSunat = 2; // Reiniciamos el índice para repetir los últimos dos pasos
+        }
+
+        // Después de 1 segundo, devolver el tamaño al normal
+        setTimeout(function () {
+            $(txtLoadingSunat).css({
                 'font-size': '1rem',  // Tamaño normal
                 'transition': 'font-size 0.5s ease'  // Transición suave
             });

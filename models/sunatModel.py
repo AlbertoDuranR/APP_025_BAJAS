@@ -23,7 +23,7 @@ class SunatValidator:
         }
         self.cookies = {
             'f5_cspm': '1234',
-            'ITCONSULTAUNIFICADASESSION' : 'sthofzceYC-cjUfRgkmGxcFIhgUSnBa7Ya51x39HkQzo5gKv1sw5SGyS8el0yXgMKrB2UciyXS1x1iWAfasC0UMIbnncQXrgfqfvpyHA-QtymY-3bp_QxAVTpb3aSu19qmm2VE6pWt5yq1xKVrzoCH3tjq-V0yU6r0UpVT7ZIDlSYFHie5EeZkQPy1mo3qtZLbTMLzES9jVE3dFPrV6y64l6Rh1aAv5FhvRvzrzFpfJIfM1tx0RsVPnLx0t9z-TZ!-459837678!-754705400'
+            'ITCONSULTAUNIFICADASESSION' : 'wuZx5OQkVxxcmBLdcYVS-gs8YA7rkxGCK5fnnVxo8g2lWKVveqhPPGPT8jlof9H3ozQRyy4ZzfYO7xiCuMh2dk1pgBLeUl6q85JgPsSKrqS-CQaYvCfJaibb2rTxUiPqmwhIgONohMz8aPcHqVpcHDsEH5-I01AYs9cyM7X6asx_Pta94loHu3uCZ6dmYegehddqQt-gsq5KOt-vM1-WGaVoe_uzxn0FvO-GyBILg8cQry6IFxfddOGkDbctJ6Uo!922719023!-459837678'
 
         }
 
