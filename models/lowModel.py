@@ -94,7 +94,7 @@ class LowModel:
                 return send_file(zip_path, as_attachment=True)
         
             else:
-                return jsonify({"message": "falso"})  # No se pudo crear el ZIP
+                return jsonify({"message": "Error al descargar"})  # No se pudo crear el ZIP
 
         except Exception as e:
             return jsonify({"message": "falso", "error": str(e)}), 500  # Hubo un error durante el proceso

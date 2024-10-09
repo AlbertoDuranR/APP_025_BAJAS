@@ -407,7 +407,6 @@ async function descargarArchivos() {
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error('Error al descargar los archivos:', error);
-        alert('Ocurrió un error al descargar los archivos.');
+        error('Error', 'Ocurrió un error al descargar los archivos.')
     }
 }
