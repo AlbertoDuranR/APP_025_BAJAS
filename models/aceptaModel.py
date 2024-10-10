@@ -10,14 +10,20 @@ import glob
 from utils.responseBuilder import responseBuilder
 
 class aceptaModel:
-    def __init__(self):
+    def __init__(self,):
         self.driver = None
+        self.selenium_grid_url = "http://40.86.9.189:4444"
 
-    # Función para iniciar el navegador
+    # Función para iniciar el navegador usando Selenium Grid
     def iniciar_navegador(self):
         chrome_options = Options()
         chrome_options.add_argument("--start-maximized")
-        self.driver = webdriver.Chrome(options=chrome_options)
+        
+        # Configuramos el navegador para conectarse al Selenium Grid
+        self.driver = webdriver.Remote(
+            command_executor=self.selenium_grid_url,
+            options=chrome_options
+        )
 
     # Función para iniciar sesión
     def iniciar_sesion(self):

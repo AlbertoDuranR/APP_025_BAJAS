@@ -10,6 +10,12 @@ sunat = Blueprint('sunat', __name__)
 
 model = SunatValidator()
 
+# Ruta para la plantilla HTML
+@sunat.route('/', methods=['GET'])
+def process_index():
+    return render_template('cookie.html')
+
+
 @sunat.route('/validate', methods=['POST'])
 def validate():
     folder_path = request.form.get('folder_path')
@@ -33,7 +39,7 @@ def validate():
 
 @sunat.route('/updateToken', methods=['POST'])
 def updateToken():
-    token = request.form.get('token')
+    token = request.form.get('cookie')
     
     if not token:
         return responseBuilder.error('No se especificó un token válido')
@@ -78,7 +84,7 @@ def getToken():
             cookie_data = json.load(file)
 
         # Devolver la información de la cookie
-        return responseBuilder.success(cookie_data)
+        return responseBuilder.success("cookie obtenido correctamente",cookie_data)
 
     except Exception as e:
         return responseBuilder.error(f"Ocurrió un error al obtener el token: {str(e)}")

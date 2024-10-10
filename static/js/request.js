@@ -2,8 +2,8 @@
 async function getRequest(url, params = {}) {
     try {
       const res = await axios.get(url, { params });
-      if (res.success){
-        return res
+      if (res.status == 200){
+        return res.data
       }
     } catch (error) {
       console.error("Error en la petición GET:", error);

@@ -1,0 +1,56 @@
+{% extends 'layout.html'%}
+
+<style>
+  .table-responsive {
+    overflow-x: auto; /* Para que tenga scroll horizontal si es necesario */
+}
+
+.table th, .table td {
+    white-space: nowrap; /* Evita que las columnas se rompan en varias líneas */
+    text-align: center;   /* Centrar el contenido de las columnas */
+}
+
+h6 {
+    font-size: 0.9rem;  /* Reduce ligeramente el tamaño del texto de los encabezados */
+}
+
+</style>
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+    <div class="col">
+      <div class="card w-100">
+        <div class="card-header">Cookie</div>
+        <div class="card-body p-4 text-center">
+          <h5 class="card-title fw-semibold mb-4">Actualizar Cookie</h5>
+          <form>
+            <img src="{{ url_for('static', filename='/images/logos/cookie.png') }}" class="mx-auto d-block mt-5 mb-3" alt="" style="width: 130px;">
+            <p class="my-3" id="fecha"></p>
+            <p class="my-3" id="cookie"></p>
+            <textarea name="" id="nuevoToken" class="form-control my-4"></textarea>
+            <button class="btn btn-primary w-100" id="botonActualizarCookie">Actualizar cookie</button>
+            <!-- Barra de progreso -->
+          </form>
+        </div>
+      </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block apps %}
+<!-- Personalizado -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"/>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/pages/functionsCookie.js') }}"></script>
+{% endblock %}
