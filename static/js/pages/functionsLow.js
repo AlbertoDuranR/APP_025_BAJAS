@@ -60,7 +60,7 @@ let carpetaSunat = null;
 
 $(document).ready(function () {
     // botones deshabiliados
-    // disableButtons()
+    disableButtons()
 
     // Evento para cargar archivo
     $(elementos.botonCargarArchivo).click(function (e) {
@@ -120,6 +120,7 @@ async function cargarArchivo() {
         $("#numberRows").text(numeroFilas + " Filas");
         updateProgressBar(elementos.barraProgresoCarga, 100)
         enableButton(elementos.botonProcesar)
+        enableButton(elementos.botonDescargarArchivos)
     } else {
         error("Error", response.message)
     }
@@ -182,8 +183,6 @@ async function validarArchivo() {
     // Añadir a FormData
     let dataForm = new FormData();
 
-    // let tempCarpeta = "static\\\\uploads\\\\2024_10_07_12_28_54\\sunat";
-
     dataForm.append("folder_path", carpetaSunat);
 
     // Petición POST
@@ -194,6 +193,7 @@ async function validarArchivo() {
     // validar respuesta
     if (response.success) {
         texto("Éxito", response.message, "success");
+        updateProgressBar(elementos.barraProgresoValidar, 100);
 
         // Limpiar el contenido actual de la tabla
         $("#tableBody").empty();
@@ -258,6 +258,8 @@ function disableButtons() {
     $(elementos.botonProcesar).prop("disabled", true);
     $(elementos.botonBaja).prop("disabled", true);
     $(elementos.botonValidar).prop("disabled", true);
+
+    $(elementos.botonDescargarArchivos).prop("disabled", true);
 }
 
 // habilitar boton
@@ -370,12 +372,12 @@ function textoAcepta(titulo, texto, icono) {
 
 async function descargarArchivos() {
     // Definir la carpeta que se enviará en el request
-    let url_folder = 'static/uploads/2024_10_09_16_59_00';  // Ajusta la carpeta deseada
+    // let url_folder = 'static/uploads/2024_10_09_16_59_00';  // Ajusta la carpeta deseada
 
     try {
         // Crear un objeto FormData para enviar la información
         let formData = new FormData();
-        formData.append('url_folder', url_folder);  // Añadir la ruta de la carpeta
+        formData.append('url_folder', carpetaPrincipal);  // Añadir la ruta de la carpeta
 
         // Realizar la solicitud POST usando Axios
         const response = await axios({
