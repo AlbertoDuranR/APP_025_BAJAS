@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 # importamos las rutas
 from routes.lowRoute import low
+from routes.validateRoute import validate
 from routes.sunatRoutes import sunat
 from routes.aceptaRoute import acepta
 
@@ -11,6 +12,7 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 # registramos los Blueprints
 app.register_blueprint(low, url_prefix='/low')
+app.register_blueprint(validate, url_prefix='/validate')
 app.register_blueprint(sunat, url_prefix='/sunat')
 app.register_blueprint(acepta, url_prefix='/acepta')
 
