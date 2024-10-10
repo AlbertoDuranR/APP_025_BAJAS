@@ -6,9 +6,11 @@ import os
 import json
 import pandas as pd
 
+
 class SunatValidator:
     def __init__(self):
         self.url = "https://ww1.sunat.gob.pe/ol-ti-itconsultaunificada/consultaUnificada/importarFromTXT"
+        self.cookie = self.obtenerToken()
         self.headers = {
             "accept": "application/json, text/javascript, */*; q=0.01",
             "accept-language": "es-ES,es;q=0.9,en;q=0.8",
@@ -23,9 +25,25 @@ class SunatValidator:
         }
         self.cookies = {
             'f5_cspm': '1234',
-            'ITCONSULTAUNIFICADASESSION' : 'T9h3hcYwcAdqLnWjIrEUERVk41xCNrQFbX6L6cyM6EFxoMAymFyaQ-TMHZDqez6QVZhCMo6fdWG1Q0eTmfYibvyMQXh8rEPI49JbjkevNR2Jn0JucVNEUFZMk4GfNViRavgNZ00zh3xOx_uvc-nQp2AtJKFmUsjy72sYWy0eG0iPdkCz9xcvqbjsFTxtZT2OTxnrRprfldkZFCijDv3ImHe7GfpaqTDxHBVvKsuwHRaSQYIoZPqE6dy9LnolTvQL!-459837678!-754705400'
+            'ITCONSULTAUNIFICADASESSION' : self.cookie
 
         }
+
+    def obtenerToken(self):
+        try:
+            # Definir la ruta del archivo cookie.json
+            cookie_file_path = os.path.join('token', 'cookie.json')
+
+            # Leer el archivo JSON actual
+            with open(cookie_file_path, 'r') as file:
+                cookie_data = json.load(file)
+
+            # Devolver el valor de la clave "cookie"
+            return cookie_data["cookie"]
+        
+        except Exception as e:
+            return None
+
 
     def leerArchivo(self, file_path: str) -> bytes:
         if not os.path.exists(file_path):
