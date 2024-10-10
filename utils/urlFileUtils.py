@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime
 
 class UrlFile:
@@ -34,8 +35,33 @@ class UrlFile:
         # Retorna la ruta de la carpeta principal
         return newFolderPath
     
+    def deleteOldFolders(self):
+        # Ruta base del directorio 'static/uploads'
+        baseDir = os.path.join('static', 'uploads')
+        
+        # Obtener la fecha actual
+        today = datetime.now().strftime("%Y_%m_%d")
+        
+        try:
+            # Listar las carpetas en el directorio base
+            for folder in os.listdir(baseDir):
+                folderPath = os.path.join(baseDir, folder)
+                
+                # Verificar que sea un directorio
+                if os.path.isdir(folderPath):
+                    # Extraer la fecha de la carpeta (primeros 10 caracteres: año_mes_dia)
+                    folderDate = folder[:10]
+                    
+                    # Si la fecha de la carpeta es anterior a la fecha de hoy, eliminarla
+                    if folderDate < today:
+                        shutil.rmtree(folderPath)
+                        print(f"Carpeta eliminada: {folderPath}")
+        
+        except Exception as e:
+            print(f"Error al eliminar carpetas: {str(e)}")
+    
 
 # Testear
 # ap = getUploadFolder()
-# resp = ap.createDirectory()
+# resp = ap.deleteOldFolders()
 # print(resp)

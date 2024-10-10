@@ -30,6 +30,9 @@ def upload():
         return responseBuilder.error('No se especificó un período')
 
     try:
+        # limpiar carpeta
+        urlFile.deleteOldFolders()
+
         # Crear la carpeta para almacenar el archivo
         upload_folder = urlFile.getUploadFolder()
         

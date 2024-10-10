@@ -14,6 +14,9 @@ class LowModel:
     # limpieza del archivo excel cargado
     def fileCleanup(self,upload_folder, filePath, period):
         try:
+            # 0. Eliminar carpetas de dias anteriores
+            
+
             # 1. Leer y limpiar el archivo Excel
             df_cleaned = self.excel.cleanExcel(filePath)
 
