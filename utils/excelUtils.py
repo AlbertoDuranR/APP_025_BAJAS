@@ -16,35 +16,40 @@ class excelUtils:
 
         return df_cleaned
     
+
+
     def filterByPeriod(self, df, period):
         """
-        Filtrar las filas que coincidan con el período proporcionado.
-        El período debe estar en formato 'YYYY-MM'.
+        Filtrar las filas que coincidan con el período proporcionado en formato 'YYYY-MM'.
+        Cualquier registro fuera del período será eliminado.
         """
         try:
-            # Asegurar que la columna de Fecha existe
+            # Verificar si la columna 'Fecha' existe
             if 'Fecha' not in df.columns:
                 raise ValueError("No se encontró la columna 'Fecha' en el archivo.")
 
-            # Convertir la columna 'Fecha' a datetime (si no lo es)
-            df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
+            # Convertir la columna 'Fecha' a tipo datetime usando el formato adecuado
+            df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y', errors='coerce')
 
-            # Extraer el período en formato 'YYYY-MM' de la columna 'Fecha'
+            # Extraer el período en formato 'YYYY-MM'
             df['Periodo'] = df['Fecha'].dt.strftime('%Y-%m')
 
             # Filtrar las filas que coincidan con el período proporcionado
             df_filtered = df[df['Periodo'] == period].copy()
 
-            # Eliminar la columna 'Periodo' ya que no es necesaria en el archivo final
+            # Eliminar la columna 'Periodo' ya que no es necesaria
             df_filtered.drop(columns=['Periodo'], inplace=True)
 
-            df_filtered['Fecha'] = pd.to_datetime(df_filtered['Fecha'], errors='coerce').dt.strftime('%d/%m/%Y')
+            # Formatear la columna 'Fecha' de nuevo a 'DD/MM/YYYY' para conservar el formato original
+            df_filtered['Fecha'] = df_filtered['Fecha'].dt.strftime('%d/%m/%Y')
 
+            # Retornar el dataframe filtrado
             return df_filtered
 
         except Exception as e:
             print(f"Error al filtrar por período: {str(e)}")
             raise
+
 
     # Función para guardar los datos limpiados
     def saveCleanedData(self, df_cleaned, filePath):
@@ -135,7 +140,7 @@ class excelUtils:
     def get_output_directory_sunat(self, filePath):
         return os.path.join(os.path.dirname(filePath), 'sunat')
 
-    def split_and_save_txt(self, df_sunat, output_dir, rows_per_file=45):
+    def split_and_save_txt(self, df_sunat, output_dir, rows_per_file=100):
         # Eliminar filas que estén completamente vacías o tengan solo espacios
         df_sunat = df_sunat.dropna(how='all').apply(lambda x: x.str.strip() if x.dtype == "object" else x)
         df_sunat = df_sunat.replace('', np.nan).dropna(how='any')
