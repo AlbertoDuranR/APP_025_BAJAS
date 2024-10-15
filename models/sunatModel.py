@@ -135,7 +135,7 @@ class SunatValidator:
                     intentos += 1
                     print(f"Error procesando el archivo {file_path}. Intento {intentos}/{max_intentos}. Error: {e}")
                     if intentos < max_intentos:
-                        time.sleep(5)  # Espera antes de reintentar
+                        time.sleep(2)  # Espera antes de reintentar
                     else:
                         print(f"Falló al procesar el archivo {file_path} después de {max_intentos} intentos.")
         

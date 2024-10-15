@@ -149,7 +149,22 @@ class excelUtils:
         
         for i in range(num_parts):
             part_df = df_sunat.iloc[i * rows_per_file:(i + 1) * rows_per_file]
+
+            # Convertir el DataFrame en una lista de líneas de texto
             output_path = os.path.join(output_dir, f'sunat_{i + 1}.txt')
+            
+            # Guardar el DataFrame en un archivo temporal antes de aplicar la limpieza
             part_df.to_csv(output_path, sep='|', index=False, header=False)
-        
+            
+            # Leer el archivo temporal para limpiar líneas vacías o con espacios
+            with open(output_path, 'r') as file:
+                lines = file.readlines()
+
+            # Eliminar líneas que están vacías o que solo contienen espacios
+            lines = [line.strip() for line in lines if line.strip()]
+
+            # Guardar el archivo sin líneas vacías al final
+            with open(output_path, 'w') as file:
+                file.write('\n'.join(lines))
+            
         return num_parts

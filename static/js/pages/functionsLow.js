@@ -228,6 +228,14 @@ async function validarArchivo() {
             pageLength: 10,    // Muestra 10 registros por página
             scrollX: true,     // Habilitar scroll horizontal si es necesario
             lengthMenu: [10, 25, 50, 75, 100],  // Opciones de selección de registros
+            dom: 'Bfrtip',     // Definir la estructura de los elementos de la tabla (Botones, filtros, etc.)
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Descargar Excel',
+                    titleAttr: 'Exportar a Excel'
+                }
+            ],
             language: {
                 search: "Buscar:",
                 lengthMenu: "Mostrar _MENU_ entradas",

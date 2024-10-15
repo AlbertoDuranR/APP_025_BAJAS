@@ -40,7 +40,7 @@ let carpetaSunat = null;
 
 $(document).ready(function () {
     // botones deshabiliados
-    disableButtons()
+    // disableButtons()
 
     // Evento para cargar archivo
     $(elementos.botonCargarArchivo).click(function (e) {
@@ -139,6 +139,11 @@ async function validarArchivo() {
     // Añadir a FormData
     let dataForm = new FormData();
 
+    console.log(carpetaSunat);
+
+    carpetaSunat = "static/uploads/2024_10_15_15_36_57/sunat"
+    
+
     dataForm.append("folder_path", carpetaSunat);
 
     // Petición POST
@@ -177,13 +182,20 @@ async function validarArchivo() {
             $("#tableBody").append(row);
         });
 
-        // Volver a inicializar DataTables
         $('#tableValidate').DataTable({
-            responsive: true,  // Hacer la tabla responsive
-            autoWidth: false,  // Deshabilitar el autoajuste de columnas
-            pageLength: 10,    // Muestra 10 registros por página
-            scrollX: true,     // Habilitar scroll horizontal si es necesario
-            lengthMenu: [10, 25, 50, 75, 100],  // Opciones de selección de registros
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            scrollX: true,
+            lengthMenu: [10, 25, 50, 75, 100],
+            dom: 'Bfrtip', // Aquí se especifican los botones y la estructura de la tabla
+            buttons: [
+                {
+                    extend: 'csvHtml5',
+                    text: 'Descargar excel',
+                    titleAttr: 'Exportar a CSV'
+                }
+            ],
             language: {
                 search: "Buscar:",
                 lengthMenu: "Mostrar _MENU_ entradas",
@@ -194,6 +206,7 @@ async function validarArchivo() {
                 }
             }
         });
+        
 
     } else {
         error("Error", response.message);
