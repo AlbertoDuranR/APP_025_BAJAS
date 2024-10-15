@@ -5,6 +5,7 @@ import time
 import os
 import json
 import pandas as pd
+import concurrent.futures
 
 
 class SunatValidator:
@@ -108,44 +109,52 @@ class SunatValidator:
             print("Error en la respuesta principal")
             return None  # Error en la respuesta principal
 
-    def procesarArchivos(self, folder_path: str, max_intentos=10):
+    def procesarArchivo(self, file_path, max_intentos=10):
+        intentos = 0
+        exito = False
+        while intentos < max_intentos and not exito:
+            print(f"Procesando archivo: {file_path}, intento {intentos + 1}")
+            try:
+                df = self.peticiones(file_path)
+                if df is not None:
+                    print(f"Archivo {file_path} procesado con éxito en el intento {intentos + 1}")
+                    return df  # Devuelve el DataFrame si tiene éxito
+                else:
+                    raise Exception("Error en la respuesta de la plataforma")
+            except Exception as e:
+                intentos += 1
+                print(f"Error procesando el archivo {file_path}. Intento {intentos}/{max_intentos}. Error: {e}")
+                if intentos < max_intentos:
+                    time.sleep(2)  # Espera antes de reintentar
+                else:
+                    print(f"Falló al procesar el archivo {file_path} después de {max_intentos} intentos.")
+                    return None  # Retorna None si falló
+
+    def procesarArchivos(self, folder_path: str, max_workers=5, max_intentos=10):
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f"La carpeta '{folder_path}' no se encontró.")
         
-        # Crear lista para almacenar los DataFrames
-        lista_dataframes = []
-        
-        # Crear lista con los archivos encontrados en la ruta
         archivos_encontrados = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
         
-        for file_path in archivos_encontrados:
-            intentos = 0
-            exito = False
-            while intentos < max_intentos and not exito:
-                print(f"Procesando archivo: {file_path}, intento {intentos + 1}")
+        # Ejecutar en paralelo usando ThreadPoolExecutor
+        lista_dataframes = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Ejecutar la función `procesarArchivo` en paralelo para cada archivo
+            futuros = [executor.submit(self.procesarArchivo, file_path, max_intentos) for file_path in archivos_encontrados]
+            
+            for futuro in concurrent.futures.as_completed(futuros):
                 try:
-                    df = self.peticiones(file_path)
-                    if df is not None:
-                        lista_dataframes.append(df)  # Agregar el DataFrame a la lista
-                        exito = True
-                        print(f"Archivo {file_path} procesado con éxito en el intento {intentos + 1}")
-                    else:
-                        raise Exception("Error en la respuesta de la plataforma")
+                    resultado = futuro.result()
+                    if resultado is not None:
+                        lista_dataframes.append(resultado)  # Agregar DataFrame a la lista si tuvo éxito
                 except Exception as e:
-                    intentos += 1
-                    print(f"Error procesando el archivo {file_path}. Intento {intentos}/{max_intentos}. Error: {e}")
-                    if intentos < max_intentos:
-                        time.sleep(2)  # Espera antes de reintentar
-                    else:
-                        print(f"Falló al procesar el archivo {file_path} después de {max_intentos} intentos.")
-        
+                    print(f"Error procesando un archivo: {e}")
+
         # Concatenar todos los DataFrames en uno solo
         if lista_dataframes:
             df_final = pd.concat(lista_dataframes, ignore_index=True)
             print("Todos los DataFrames unidos en uno solo:")
-
             return df_final
         else:
             print("No se generaron DataFrames.")
             return None
-
