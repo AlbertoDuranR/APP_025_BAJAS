@@ -165,22 +165,25 @@ async function validarArchivo() {
             $('#tableValidate').DataTable().clear().destroy();
         }
 
+
+
         // Llenar los datos en la tabla
         response.data.forEach((item) => {
-            let row = `
-            <tr>
-                <td>${item.numRuc}</td>
-                <td>${item.codComp}</td>
-                <td>${item.numeroSerie}-${item.numero}</td>
-                <td>${item.fechaEmision}</td>
-                <td>${item.monto}</td>
-                <td>${item.estadoCp}</td>
-                <td>${item.estadoRuc}</td>
-                <td>${item.condDomiRuc}</td>
-                <td>${item.observaciones || ''}</td>
-            </tr>`;
-            $("#tableBody").append(row);
-        });
+        let observacion = item.observaciones ? item.observaciones.replace(/^- /, '') : ''; // Eliminar el prefijo '-' si existe
+        let row = `
+        <tr>
+            <td>${item.numRuc}</td>
+            <td>${item.codComp}</td>
+            <td>${item.numeroSerie}-${item.numero}</td>
+            <td>${item.fechaEmision}</td>
+            <td>${item.monto}</td>
+            <td>${item.estadoCp}</td>
+            <td>${item.estadoRuc}</td>
+            <td>${item.condDomiRuc}</td>
+            <td>${observacion}</td> <!-- Observación sin guion -->
+        </tr>`;
+        $("#tableBody").append(row);
+    });
 
         $('#tableValidate').DataTable({
             responsive: true,
@@ -193,7 +196,10 @@ async function validarArchivo() {
                 {
                     extend: 'csvHtml5',
                     text: 'Descargar excel',
-                    titleAttr: 'Exportar a CSV'
+                    titleAttr: 'Exportar a CSV',
+                    exportOptions: {
+                        columns: ':visible' // Asegúrate de que todas las columnas visibles se exporten, incluida la de observaciones
+                    }
                 }
             ],
             language: {
