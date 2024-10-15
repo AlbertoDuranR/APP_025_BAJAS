@@ -139,10 +139,6 @@ async function validarArchivo() {
     // Añadir a FormData
     let dataForm = new FormData();
 
-    console.log(carpetaSunat);
-
-    carpetaSunat = "static/uploads/2024_10_15_15_36_57/sunat"
-    
 
     dataForm.append("folder_path", carpetaSunat);
 
