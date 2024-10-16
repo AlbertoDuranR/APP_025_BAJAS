@@ -86,6 +86,7 @@ async function cargarArchivo() {
     let dataForm = new FormData();
     dataForm.append("file", archivo);
     dataForm.append("period", periodo);
+    dataForm.append("functionApp", "validate");
 
     // Petición POST
     let response = await postRequest("/low/upload", dataForm);

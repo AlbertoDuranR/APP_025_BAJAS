@@ -22,12 +22,17 @@ def upload():
     # Verificar si se ha enviado un archivo en la petición
     file = request.files.get('file')
     period = request.form.get('period')
+    functionApp = request.form.get('functionApp')
+
+    print(functionApp)
 
     if not file:
         return responseBuilder.error('No se cargó ningún archivo')
 
-    if not period:
-        return responseBuilder.error('No se especificó un período')
+    # if not period:
+    #     return responseBuilder.error('No se especificó un período')
+
+
 
     try:
         # limpiar carpeta
@@ -41,7 +46,7 @@ def upload():
         file.save(file_path)
 
         # Limpiar el archivo para Acepta y filtrar por el período
-        return model.fileCleanup(upload_folder, file_path, period)
+        return model.fileCleanup(upload_folder, file_path, period, functionApp)
        
     except Exception as e:
         # Manejo de errores durante el proceso de carga de archivos

@@ -12,7 +12,7 @@ class LowModel:
         self.excel = excelUtils()  # Instancia de excelUtils
 
     # limpieza del archivo excel cargado
-    def fileCleanup(self,upload_folder, filePath, period):
+    def fileCleanup(self,upload_folder, filePath, period, functionApp):
         try:
             # 0. Eliminar carpetas de dias anteriores
             
@@ -21,7 +21,8 @@ class LowModel:
             df_cleaned = self.excel.cleanExcel(filePath)
 
             # 2. Filtrar las filas por el período (YYYY-MM)
-            df_cleaned = self.excel.filterByPeriod(df_cleaned, period)
+            if functionApp == "low":
+                df_cleaned = self.excel.filterByPeriod(df_cleaned, period)
 
             # 3. Guardar los datos limpiados y filtrados en el archivo
             self.excel.saveCleanedData(df_cleaned, filePath)
