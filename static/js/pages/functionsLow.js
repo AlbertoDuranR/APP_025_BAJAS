@@ -59,6 +59,34 @@ let carpetaAcepta = null;
 let carpetaSunat = null;
 
 $(document).ready(function () {
+
+     // Inicializar DataTable cuando el documento esté listo
+     $('#tableValidate').DataTable({
+        responsive: true,
+        autoWidth: false,
+        pageLength: 10,
+        scrollX: true,
+        lengthMenu: [10, 25, 50, 75, 100],
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                title: 'Resultados de Validaciones en Sunat',
+                text: 'Exportar a Excel',
+                className: 'btn btn-success'
+            }
+        ],
+        language: {
+            search: "Buscar:",
+            lengthMenu: "Mostrar _MENU_ entradas",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+            paginate: {
+                previous: "Anterior",
+                next: "Siguiente"
+            }
+        }
+    });
+
     // botones deshabiliados
     disableButtons()
 
@@ -151,7 +179,9 @@ async function procesarArchivo() {
     }
 }
 
-// Funcion pase 3 - Dar de baja en acepta
+
+// Función para baja de archivo - Paso 3
+// Función para baja de archivo - Paso 3
 async function bajaArchivo() {
     // Añadir a FormData
     let dataForm = new FormData();
@@ -160,22 +190,27 @@ async function bajaArchivo() {
     // Petición POST
     let response = await postRequest("/acepta/baja", dataForm);
 
-    // validar respuesta
+    $("#loadingModalAcepta").modal('hide');
+
+    // Validar respuesta
     if (response.success) {
-        // Limpiar el contenido previo de la tabla
-        document.getElementById("tableBodyAcepta").innerHTML = "";
+        // Obtener la instancia de DataTable
+        const table = $('#tableValidate').DataTable();
+        
+        // Limpiar la tabla antes de agregar datos nuevos
+        table.clear();
 
         // Insertar cada resultado en una fila de la tabla
         response.data.resultados.forEach(resultado => {
-            let fila = document.createElement("tr");
-
-            // Añadir celdas a la fila con los datos del archivo y las respuestas
-            fila.innerHTML = `
-                <td>${resultado.archivo}</td>
-                <td colspan="8">${resultado.respuestas.join("<br>")}</td>
-            `;
-            document.getElementById("tableBodyAcepta").appendChild(fila);
+            let fila = [
+                resultado.archivo,
+                resultado.respuestas.join("<br>")
+            ];
+            table.row.add(fila);
         });
+
+        // Redibujar la tabla después de agregar las filas
+        table.draw();
 
         updateProgressBar(elementos.barraProgresoBaja, 100);
         enableButton(elementos.botonValidar);
@@ -184,84 +219,6 @@ async function bajaArchivo() {
         error("Error", response.message);
     }
 }
-
-// Función paso 4 - Validar archivo
-async function validarArchivo() {
-    // nostramos el modal de carga
-    mostrarModalSunat();
-
-    // Añadir a FormData
-    let dataForm = new FormData();
-
-    dataForm.append("folder_path", carpetaSunat);
-
-    // Petición POST
-    let response = await postRequest("/sunat/validate", dataForm);
-
-    ocultarModalSunat()
-
-    // validar respuesta
-    if (response.success) {
-        texto("Éxito", response.message, "success");
-        updateProgressBar(elementos.barraProgresoValidar, 100);
-
-        // Limpiar el contenido actual de la tabla
-        $("#tableBody").empty();
-
-        // Verificar si la tabla ya fue inicializada con DataTables
-        if ($.fn.DataTable.isDataTable('#tableValidate')) {
-            // Si ya fue inicializada, destruye la tabla y luego vacía su contenido
-            $('#tableValidate').DataTable().clear().destroy();
-        }
-
-        // Llenar los datos en la tabla
-        response.data.forEach((item) => {
-            let row = `
-            <tr>
-                <td>${item.numRuc}</td>
-                <td>${item.codComp}</td>
-                <td>${item.numeroSerie}-${item.numero}</td>
-                <td>${item.fechaEmision}</td>
-                <td>${item.monto}</td>
-                <td>${item.estadoCp}</td>
-                <td>${item.estadoRuc}</td>
-                <td>${item.condDomiRuc}</td>
-                <td>${item.observaciones || ''}</td>
-            </tr>`;
-            $("#tableBody").append(row);
-        });
-
-        // Volver a inicializar DataTables
-        $('#tableValidate').DataTable({
-            responsive: true,  // Hacer la tabla responsive
-            autoWidth: false,  // Deshabilitar el autoajuste de columnas
-            pageLength: 10,    // Muestra 10 registros por página
-            scrollX: true,     // Habilitar scroll horizontal si es necesario
-            lengthMenu: [10, 25, 50, 75, 100],  // Opciones de selección de registros
-            dom: 'Bfrtip',     // Definir la estructura de los elementos de la tabla (Botones, filtros, etc.)
-            buttons: [
-                {
-                    extend: 'excelHtml5',
-                    text: 'Descargar Excel',
-                    titleAttr: 'Exportar a Excel'
-                }
-            ],
-            language: {
-                search: "Buscar:",
-                lengthMenu: "Mostrar _MENU_ entradas",
-                info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                paginate: {
-                    previous: "Anterior",
-                    next: "Siguiente"
-                }
-            }
-        });
-
-    } else {
-        error("Error", response.message);
-    }
-}
-
 
 
 

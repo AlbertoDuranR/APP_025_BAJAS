@@ -85,7 +85,7 @@ class aceptaModel:
 
             for archivo in archivos_csv:
                 archivo_nombre = os.path.basename(archivo)
-                respuestas, exito = self.procesar_archivo(archivo, 2)
+                respuestas, exito = self.procesar_archivo(archivo, 1)
 
                 resultado = {
                     "archivo": archivo_nombre,
