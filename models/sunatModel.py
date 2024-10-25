@@ -27,10 +27,14 @@ class SunatValidator:
         }
         self.cookies = {
             'f5_cspm': '1234',
-            'ITCONSULTAUNIFICADASESSION' : self.cookie
-
+            'ITCONSULTAUNIFICADASESSION': self.cookie
         }
 
+    def actualizarCookie(self):
+        """Obtiene un nuevo token desde la base de datos y actualiza la cookie."""
+        self.cookie = getTokenDB()  # Obtener nuevo token de la base de datos
+        self.cookies['ITCONSULTAUNIFICADASESSION'] = self.cookie
+        print("Cookie actualizada exitosamente.")
 
 
     def leerArchivo(self, file_path: str) -> bytes:
@@ -52,13 +56,13 @@ class SunatValidator:
         return multipart_data
 
     def enviarSolicitud(self, multipart_data: MultipartEncoder) -> dict:
+        """Envía la solicitud a SUNAT y maneja el error 401 con actualización de token."""
         self.headers['Content-Type'] = multipart_data.content_type
         response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies)
 
-        if response.status_code == 401:  # Si el token ha expirado
-            print("Token expirado. Obteniendo un nuevo token...")
-            self.cookie = self.obtenerToken()
-            self.cookies['ITCONSULTAUNIFICADASESSION'] = self.cookie  # Actualizar la cookie
+        if response.status_code == 401:  # Si el token ha expirado o hay problemas de credenciales
+            print("Token expirado o inválido. Obteniendo un nuevo token...")
+            self.actualizarCookie()  # Actualizar la cookie con el nuevo token
             response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies)
 
         try:
