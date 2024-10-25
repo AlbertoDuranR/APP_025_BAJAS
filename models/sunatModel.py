@@ -6,12 +6,13 @@ import os
 import json
 import pandas as pd
 import concurrent.futures
+from connection.cookie import getTokenDB
 
 
 class SunatValidator:
     def __init__(self):
         self.url = "https://ww1.sunat.gob.pe/ol-ti-itconsultaunificada/consultaUnificada/importarFromTXT"
-        self.cookie = self.obtenerToken()
+        self.cookie = getTokenDB()
         self.headers = {
             "accept": "application/json, text/javascript, */*; q=0.01",
             "accept-language": "es-ES,es;q=0.9,en;q=0.8",
@@ -30,20 +31,6 @@ class SunatValidator:
 
         }
 
-    def obtenerToken(self):
-        try:
-            # Definir la ruta del archivo cookie.json
-            cookie_file_path = os.path.join('token', 'cookie.json')
-
-            # Leer el archivo JSON actual
-            with open(cookie_file_path, 'r') as file:
-                cookie_data = json.load(file)
-
-            # Devolver el valor de la clave "cookie"
-            return cookie_data["cookie"]
-        
-        except Exception as e:
-            return None
 
 
     def leerArchivo(self, file_path: str) -> bytes:
