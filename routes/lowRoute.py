@@ -26,13 +26,10 @@ def upload():
 
     print(functionApp)
     print(period)
+    print(functionApp)
 
     if not file:
         return responseBuilder.error('No se cargó ningún archivo')
-
-    # if not period:
-    #     return responseBuilder.error('No se especificó un período')
-
 
 
     try:
@@ -40,7 +37,7 @@ def upload():
         urlFile.deleteOldFolders()
 
         # Crear la carpeta para almacenar el archivo
-        upload_folder = urlFile.getUploadFolder()
+        upload_folder = urlFile.getUploadFolder(functionApp)
         
         # Guardar el archivo subido en la carpeta creada
         file_path = os.path.join(upload_folder, file.filename)

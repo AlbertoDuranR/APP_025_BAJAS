@@ -18,10 +18,10 @@ class excelUtils:
     
 
 
-    def filterByPeriod(self, df, period):
+    def filterByPeriod(self, df, period, functionApp):
         """
         Filtrar las filas que coincidan con el período proporcionado en formato 'YYYY-MM'.
-        Cualquier registro fuera del período será eliminado.
+        Cualquier registro fuera del período será eliminado, excepto cuando functionApp es 'low'.
         """
 
         try:
@@ -32,6 +32,12 @@ class excelUtils:
             # Convertir la columna 'Fecha' a tipo datetime, manteniendo solo la fecha sin la hora
             df['Fecha'] = pd.to_datetime(df['Fecha']).dt.date
 
+            # Si la aplicación es 'low', devolver el DataFrame completo sin filtrar por período
+            if functionApp == "low":
+                df['Fecha'] = pd.to_datetime(df['Fecha']).dt.strftime('%d/%m/%Y')
+                return df
+
+            # Si no es 'low', filtrar las filas que coincidan con el período proporcionado
             # Extraer el período en formato 'YYYY-MM'
             df['Periodo'] = df['Fecha'].astype(str).str[:7]
 
@@ -44,13 +50,13 @@ class excelUtils:
             # Formatear la columna 'Fecha' en formato DD/MM/YYYY
             df_filtered['Fecha'] = pd.to_datetime(df_filtered['Fecha']).dt.strftime('%d/%m/%Y')
 
-            # Retornar el dataframe filtrado
-            print(df_filtered)
+            # Retornar el DataFrame filtrado
             return df_filtered
 
         except Exception as e:
             print(f"Error al filtrar por período: {str(e)}")
             raise
+
 
 
 

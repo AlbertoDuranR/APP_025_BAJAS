@@ -4,7 +4,7 @@ from datetime import datetime
 
 class UrlFile:
     
-    def getUploadFolder(self):
+    def getUploadFolder(self, functionApp):
         # Obtener la fecha y hora actual en el formato requerido
         currentTime = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         
@@ -20,14 +20,16 @@ class UrlFile:
         try:
             # Crear el directorio principal si no existe
             os.makedirs(newFolderPath, exist_ok=True)
+
+            if functionApp == "low":
+                # Crear subcarpeta 'acepta' dentro de la carpeta principal
+                aceptaFolder = os.path.join(newFolderPath, 'acepta')
+                os.makedirs(aceptaFolder, exist_ok=True)
             
-            # Crear subcarpeta 'acepta' dentro de la carpeta principal
-            aceptaFolder = os.path.join(newFolderPath, 'acepta')
-            os.makedirs(aceptaFolder, exist_ok=True)
-            
-            # Crear subcarpeta 'txt' dentro de la carpeta principal
-            txtFolder = os.path.join(newFolderPath, 'sunat')
-            os.makedirs(txtFolder, exist_ok=True)
+            if functionApp == "validate":
+                # Crear subcarpeta 'txt' dentro de la carpeta principal
+                txtFolder = os.path.join(newFolderPath, 'sunat')
+                os.makedirs(txtFolder, exist_ok=True)
         
         except Exception as e:
             print(f"Error al crear los directorios: {str(e)}")
