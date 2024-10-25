@@ -113,21 +113,25 @@ async function procesarArchivo() {
     // Añadir a FormData
     let dataForm = new FormData();
     dataForm.append("url_folder", archivoPrincipal);
+    
+    // Aquí deberías decidir si es "low" o "validate" según la lógica de tu aplicación
+    let functionApp = "validate"; // O "validate" dependiendo del caso
+    dataForm.append("functionApp", functionApp);
 
     // Petición POST
-    let response = await postRequest("/validate/processFile", dataForm);
+    let response = await postRequest("/low/processFile", dataForm);
 
-    // validar respuesta
+    // Validar respuesta
     if (response.success) {
-        let mensaje = response.data.sunat_response.message;
-        // carpetaAcepta = response.data.acepta_response.folder_path;
-        carpetaSunat = response.data.sunat_response.folder_path;
+        let mensaje = response.data.message;
+        carpetaSunat = response.data.folder_path;  // Guardar la carpeta para Acepta o Sunat
 
-        texto("Éxito", mensaje, "success")
-        updateProgressBar(elementos.barraProgresoProcesar, 100)
-        enableButton(elementos.botonValidar)
+        // Mostrar mensaje de éxito
+        texto("Éxito", mensaje, "success");
+        updateProgressBar(elementos.barraProgresoProcesar, 100);
+        enableButton(elementos.botonBaja);
     } else {
-        error("Error", response.message)
+        error("Error", response.message);
     }
 }
 

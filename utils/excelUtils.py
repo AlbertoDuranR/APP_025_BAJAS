@@ -17,7 +17,6 @@ class excelUtils:
         return df_cleaned
     
 
-
     def filterByPeriod(self, df, period, functionApp):
         """
         Filtrar las filas que coincidan con el período proporcionado en formato 'YYYY-MM'.
@@ -34,28 +33,35 @@ class excelUtils:
 
             # Si la aplicación es 'low', devolver el DataFrame completo sin filtrar por período
             if functionApp == "low":
+                # Formatear la columna 'Fecha' en formato DD/MM/YYYY
                 df['Fecha'] = pd.to_datetime(df['Fecha']).dt.strftime('%d/%m/%Y')
                 return df
 
-            # Si no es 'low', filtrar las filas que coincidan con el período proporcionado
-            # Extraer el período en formato 'YYYY-MM'
-            df['Periodo'] = df['Fecha'].astype(str).str[:7]
+            # Si la aplicación es 'validate', extraer el período en formato 'YYYY-MM' y filtrar
+            if functionApp == "validate":
+                # Extraer el período en formato 'YYYY-MM'
+                df['Periodo'] = df['Fecha'].astype(str).str[:7]
 
-            # Filtrar las filas que coincidan con el período proporcionado
-            df_filtered = df[df['Periodo'] == period].copy()
+                # Filtrar las filas que coincidan con el período proporcionado
+                df_filtered = df[df['Periodo'] == period].copy()
 
-            # Eliminar la columna 'Periodo' ya que no es necesaria
-            df_filtered.drop(columns=['Periodo'], inplace=True)
+                # Eliminar la columna 'Periodo' ya que no es necesaria
+                df_filtered.drop(columns=['Periodo'], inplace=True)
 
-            # Formatear la columna 'Fecha' en formato DD/MM/YYYY
-            df_filtered['Fecha'] = pd.to_datetime(df_filtered['Fecha']).dt.strftime('%d/%m/%Y')
+                # Formatear la columna 'Fecha' en formato DD/MM/YYYY
+                df_filtered['Fecha'] = pd.to_datetime(df_filtered['Fecha']).dt.strftime('%d/%m/%Y')
 
-            # Retornar el DataFrame filtrado
-            return df_filtered
+                # Retornar el DataFrame filtrado
+                return df_filtered
+
+            # Si functionApp no es "low" ni "validate", retornar error
+            else:
+                raise ValueError("functionApp no es válido. Solo se permiten 'low' o 'validate'.")
 
         except Exception as e:
             print(f"Error al filtrar por período: {str(e)}")
             raise
+
 
 
 
