@@ -54,39 +54,49 @@ def upload():
 
 @low.route('/processFile', methods=['POST'])
 def processFile():
-    
     url_folder = request.form.get('url_folder')
+    functionApp = request.form.get('functionApp')
 
+    # Validar que el parámetro URL existe
     if not url_folder:
         return responseBuilder.error('No se especificó una URL válida')
-    
+
     try:
-        # Procesar archivos Acepta
-        acepta_response = model.createFileAcepta(url_folder).get_json()
-        if not acepta_response['success']:
-            return responseBuilder.error(acepta_response['message'])
+        data = {}
 
-        # Procesar archivos Sunat
-        sunat_response = model.createFileSunat(url_folder).get_json()
-        if not sunat_response['success']:
-            return responseBuilder.error(sunat_response['message'])
+        # Procesar según el tipo de función
+        if functionApp == "low":
+            # Procesar archivos Acepta
+            acepta_response = model.createFileAcepta(url_folder).get_json()
+            if not acepta_response['success']:
+                return responseBuilder.error(acepta_response['message'])
 
-        # Combinar respuestas de éxito usando diccionarios
-        combined_data = {
-            'acepta_response': {
+            # Preparar datos para Acepta
+            data = {
                 'folder_path': acepta_response['data']['folder_path'], 
                 'message': acepta_response['message']
-            },
-            'sunat_response': {
-                'folder_path': sunat_response['data']['folder_path'], 
+            }
+            return responseBuilder.success('Archivos Acepta creados correctamente.', data)
+
+        elif functionApp == "validate":
+            # Procesar archivos Sunat
+            sunat_response = model.createFileSunat(url_folder).get_json()
+            if not sunat_response['success']:
+                return responseBuilder.error(sunat_response['message'])
+
+            # Preparar datos para Sunat
+            data = {
+                'folder_path': sunat_response['data']['folder_path'],
                 'message': sunat_response['message']
             }
-        }
-
-        return responseBuilder.success('Archivos Acepta y SUNAT creados correctamente.', combined_data)
+            return responseBuilder.success('Archivo SUNAT creado correctamente.', data)
+        else:
+            # Si el valor de functionApp no es válido
+            return responseBuilder.error('El valor de functionApp no es válido. Solo se permiten "low" o "validate".')
 
     except Exception as e:
         return responseBuilder.error(f'Ocurrió un error al procesar los archivos: {str(e)}')
+
 
 
 
