@@ -24,8 +24,6 @@ class excelUtils:
         Cualquier registro fuera del período será eliminado.
         """
 
-        print(df)
-        print(period)
         try:
             # Verificar si la columna 'Fecha' existe
             if 'Fecha' not in df.columns:

@@ -162,12 +162,21 @@ async function bajaArchivo() {
 
     // validar respuesta
     if (response.success) {
-        // Reemplazar \n por <br> en el mensaje para que los saltos de línea se respeten en HTML
-        let formattedMessage = response.message.replace(/\n/g, "<br>");
-        
-        // Mostrar éxito con los saltos de línea correctamente formateados
-        textoAcepta("Analiza la respuesta", formattedMessage, "info");
-        
+        // Limpiar el contenido previo de la tabla
+        document.getElementById("tableBodyAcepta").innerHTML = "";
+
+        // Insertar cada resultado en una fila de la tabla
+        response.data.resultados.forEach(resultado => {
+            let fila = document.createElement("tr");
+
+            // Añadir celdas a la fila con los datos del archivo y las respuestas
+            fila.innerHTML = `
+                <td>${resultado.archivo}</td>
+                <td colspan="8">${resultado.respuestas.join("<br>")}</td>
+            `;
+            document.getElementById("tableBodyAcepta").appendChild(fila);
+        });
+
         updateProgressBar(elementos.barraProgresoBaja, 100);
         enableButton(elementos.botonValidar);
         ocultarModalAcepta();
