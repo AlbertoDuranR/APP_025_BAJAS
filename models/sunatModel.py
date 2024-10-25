@@ -67,11 +67,18 @@ class SunatValidator:
     def enviarSolicitud(self, multipart_data: MultipartEncoder) -> dict:
         self.headers['Content-Type'] = multipart_data.content_type
         response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies)
-        
+
+        if response.status_code == 401:  # Si el token ha expirado
+            print("Token expirado. Obteniendo un nuevo token...")
+            self.cookie = self.obtenerToken()
+            self.cookies['ITCONSULTAUNIFICADASESSION'] = self.cookie  # Actualizar la cookie
+            response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies)
+
         try:
             return response.json()
         except ValueError:
             raise ValueError(f"Error en la respuesta, no es JSON válido: {response.text}")
+
 
     def jsonADataframe(self, json_data):
         processed_data = []

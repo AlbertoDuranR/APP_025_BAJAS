@@ -23,16 +23,19 @@ class excelUtils:
         Filtrar las filas que coincidan con el período proporcionado en formato 'YYYY-MM'.
         Cualquier registro fuera del período será eliminado.
         """
+
+        print(df)
+        print(period)
         try:
             # Verificar si la columna 'Fecha' existe
             if 'Fecha' not in df.columns:
                 raise ValueError("No se encontró la columna 'Fecha' en el archivo.")
 
-            # Convertir la columna 'Fecha' a tipo datetime usando el formato adecuado
-            df['Fecha'] = pd.to_datetime(df['Fecha'], format='%d/%m/%Y', errors='coerce')
+            # Convertir la columna 'Fecha' a tipo datetime, manteniendo solo la fecha sin la hora
+            df['Fecha'] = pd.to_datetime(df['Fecha']).dt.date
 
             # Extraer el período en formato 'YYYY-MM'
-            df['Periodo'] = df['Fecha'].dt.strftime('%Y-%m')
+            df['Periodo'] = df['Fecha'].astype(str).str[:7]
 
             # Filtrar las filas que coincidan con el período proporcionado
             df_filtered = df[df['Periodo'] == period].copy()
@@ -40,15 +43,17 @@ class excelUtils:
             # Eliminar la columna 'Periodo' ya que no es necesaria
             df_filtered.drop(columns=['Periodo'], inplace=True)
 
-            # Formatear la columna 'Fecha' de nuevo a 'DD/MM/YYYY' para conservar el formato original
-            df_filtered['Fecha'] = df_filtered['Fecha'].dt.strftime('%d/%m/%Y')
+            # Formatear la columna 'Fecha' en formato DD/MM/YYYY
+            df_filtered['Fecha'] = pd.to_datetime(df_filtered['Fecha']).dt.strftime('%d/%m/%Y')
 
             # Retornar el dataframe filtrado
+            print(df_filtered)
             return df_filtered
 
         except Exception as e:
             print(f"Error al filtrar por período: {str(e)}")
             raise
+
 
 
     # Función para guardar los datos limpiados

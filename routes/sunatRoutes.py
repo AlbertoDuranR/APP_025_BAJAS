@@ -8,7 +8,7 @@ import pytz
 
 sunat = Blueprint('sunat', __name__)
 
-model = SunatValidator()
+
 
 # Ruta para la plantilla HTML
 @sunat.route('/', methods=['GET'])
@@ -21,6 +21,9 @@ def validate():
     folder_path = request.form.get('folder_path')
 
     try:
+
+        model = SunatValidator()
+        
         # Procesar archivos en la ruta proporcionada
         response = model.procesarArchivos(folder_path)
 

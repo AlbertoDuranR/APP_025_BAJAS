@@ -56,6 +56,9 @@ class aceptaModel:
 
     # Función para dar de baja el archivo procesado
     def dar_baja(self):
+
+        time.sleep(5)
+
         baja_xpath = '/html/body/div[8]/div[1]/section/div[2]/div/div/div[2]/div/div/div/div/div[2]/div/div[4]/form/div[1]/input'
         wait = WebDriverWait(self.driver, 60).until(ec.visibility_of_element_located((By.XPATH, baja_xpath)))
         self.driver.find_element("xpath", baja_xpath).click()

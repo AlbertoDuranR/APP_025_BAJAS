@@ -25,6 +25,7 @@ def upload():
     functionApp = request.form.get('functionApp')
 
     print(functionApp)
+    print(period)
 
     if not file:
         return responseBuilder.error('No se cargó ningún archivo')

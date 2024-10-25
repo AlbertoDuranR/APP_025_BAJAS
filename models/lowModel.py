@@ -21,8 +21,7 @@ class LowModel:
             df_cleaned = self.excel.cleanExcel(filePath)
 
             # 2. Filtrar las filas por el período (YYYY-MM)
-            if functionApp == "low":
-                df_cleaned = self.excel.filterByPeriod(df_cleaned, period)
+            df_cleaned = self.excel.filterByPeriod(df_cleaned, period)
 
             # 3. Guardar los datos limpiados y filtrados en el archivo
             self.excel.saveCleanedData(df_cleaned, filePath)
