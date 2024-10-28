@@ -10,4 +10,11 @@ docker logs app_bajas_container
 # detener contenedor
 docker stop app_bajas_container
 
+# Instalador
+python -m venv env
+.\env\Scripts\activate
+pip install -r requirements.txt
+
+
+
 
