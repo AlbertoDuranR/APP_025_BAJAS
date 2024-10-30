@@ -128,7 +128,7 @@ class SunatValidator:
                     print(f"Falló al procesar el archivo {file_path} después de {max_intentos} intentos.")
                     return None  # Retorna None si falló
 
-    def procesarArchivos(self, folder_path: str, max_workers=5, max_intentos=10):
+    def procesarArchivos(self, folder_path: str, max_workers=8, max_intentos=5):
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f"La carpeta '{folder_path}' no se encontró.")
         
