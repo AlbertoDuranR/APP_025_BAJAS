@@ -24,9 +24,6 @@ def upload():
     period = request.form.get('period')
     functionApp = request.form.get('functionApp')
 
-    print(functionApp)
-    print(period)
-    print(functionApp)
 
     if not file:
         return responseBuilder.error('No se cargó ningún archivo')
@@ -79,6 +76,7 @@ def processFile():
             return responseBuilder.success('Archivos Acepta creados correctamente.', data)
 
         elif functionApp == "validate":
+            print("opcion escoggida validate")
             # Procesar archivos Sunat
             sunat_response = model.createFileSunat(url_folder).get_json()
             if not sunat_response['success']:

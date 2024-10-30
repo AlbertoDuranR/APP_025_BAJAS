@@ -19,7 +19,7 @@ class LowModel:
 
             # 1. Leer y limpiar el archivo Excel
             df_cleaned = self.excel.cleanExcel(filePath)
-
+            
             # 2. Filtrar las filas por el período (YYYY-MM)
             df_cleaned = self.excel.filterByPeriod(df_cleaned, period, functionApp)
 
@@ -63,6 +63,7 @@ class LowModel:
         try:
             # 1. Leer y procesar el archivo Excel
             df_sunat = self.excel.process_excel_file_sunat(filePath)
+            print(df_sunat)
 
             # 2. Obtener la carpeta 'sunat' ya existente
             output_dir = self.excel.get_output_directory_sunat(filePath)
