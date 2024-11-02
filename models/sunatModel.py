@@ -7,7 +7,7 @@ import json
 import pandas as pd
 import concurrent.futures
 from connection.cookie import getTokenDB
-
+from datetime import datetime
 
 class SunatValidator:
     def __init__(self):
@@ -23,6 +23,7 @@ class SunatValidator:
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
             "x-requested-with": "XMLHttpRequest",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
             "Referrer-Policy": "strict-origin-when-cross-origin"
         }
         self.cookies = {
@@ -32,18 +33,18 @@ class SunatValidator:
 
     def actualizarCookie(self):
         """Obtiene un nuevo token desde la base de datos y actualiza la cookie."""
-        self.cookie = getTokenDB()  # Obtener nuevo token de la base de datos
+        self.cookie = getTokenDB()
         self.cookies['ITCONSULTAUNIFICADASESSION'] = self.cookie
-        print("Cookie actualizada exitosamente.")
-
 
     def leerArchivo(self, file_path: str) -> bytes:
         if not os.path.exists(file_path):
+            print(f"Error: Archivo no encontrado: {file_path}")
             raise FileNotFoundError(f"El archivo '{file_path}' no se encontró.")
         
         with open(file_path, "rb") as file:
             file_content = file.read()
             if not file_content:
+                print(f"Error: El archivo está vacío o no es accesible: {file_path}")
                 raise ValueError("El archivo está vacío o no es accesible.")
         
         return file_content
@@ -58,18 +59,21 @@ class SunatValidator:
     def enviarSolicitud(self, multipart_data: MultipartEncoder) -> dict:
         """Envía la solicitud a SUNAT y maneja el error 401 con actualización de token."""
         self.headers['Content-Type'] = multipart_data.content_type
-        response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies)
-
-        if response.status_code == 401:  # Si el token ha expirado o hay problemas de credenciales
-            print("Token expirado o inválido. Obteniendo un nuevo token...")
-            self.actualizarCookie()  # Actualizar la cookie con el nuevo token
-            response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies)
-
         try:
-            return response.json()
-        except ValueError:
-            raise ValueError(f"Error en la respuesta, no es JSON válido: {response.text}")
+            print("Enviando solicitud a SUNAT...")
+            response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies, timeout=60)
 
+            if response.status_code == 401:
+                print("Error: Token expirado o inválido. Actualizando token.")
+                self.actualizarCookie()
+                response = requests.post(self.url, headers=self.headers, data=multipart_data, cookies=self.cookies, timeout=60)
+            return response.json()
+        except requests.Timeout:
+            print("Error: Tiempo de espera excedido en la solicitud a SUNAT.")
+            raise TimeoutError("Tiempo de espera excedido en la solicitud a SUNAT.")
+        except ValueError:
+            print(f"Error: Respuesta no es JSON válido: {response.text}")
+            raise ValueError(f"Error en la respuesta, no es JSON válido: {response.text}")
 
     def jsonADataframe(self, json_data):
         processed_data = []
@@ -92,67 +96,59 @@ class SunatValidator:
     def peticiones(self, ruta):
         multipart_data = self.prepararMultipart(ruta)
         respuesta = self.enviarSolicitud(multipart_data)
-               
+
         if isinstance(respuesta, str):
             respuesta_json = json.loads(respuesta)
-            # print(respuesta_json)
             if respuesta_json.get('rpta') == 1:
                 data = respuesta_json['lista']
                 df = self.jsonADataframe(data)
-                return df  # Retorna el DataFrame
+                return df
             else:
-                print("Error en la respuesta")
-                return None  # Error en la respuesta
+                print("Error: Respuesta JSON recibida es incorrecta")
+                return None
         else:
-            print("Error en la respuesta principal")
-            return None  # Error en la respuesta principal
+            print("Error: Respuesta principal es incorrecta")
+            return None
 
     def procesarArchivo(self, file_path, max_intentos=10):
         intentos = 0
-        exito = False
-        while intentos < max_intentos and not exito:
-            print(f"Procesando archivo: {file_path}, intento {intentos + 1}")
+        while intentos < max_intentos:
+            intentos += 1
             try:
                 df = self.peticiones(file_path)
                 if df is not None:
-                    print(f"Archivo {file_path} procesado con éxito en el intento {intentos + 1}")
-                    return df  # Devuelve el DataFrame si tiene éxito
+                    print(f"Intento {intentos}: procesamiento exitoso")
+                    return df
                 else:
                     raise Exception("Error en la respuesta de la plataforma")
             except Exception as e:
-                intentos += 1
-                print(f"Error procesando el archivo {file_path}. Intento {intentos}/{max_intentos}. Error: {e}")
-                if intentos < max_intentos:
-                    time.sleep(2)  # Espera antes de reintentar
-                else:
-                    print(f"Falló al procesar el archivo {file_path} después de {max_intentos} intentos.")
-                    return None  # Retorna None si falló
+                print(f"Intento {intentos}: error - {e}")
+                time.sleep(8)
+                
+        print(f"Falló el procesamiento del archivo '{file_path}' después de {max_intentos} intentos.")
+        return None
 
-    def procesarArchivos(self, folder_path: str, max_workers=8, max_intentos=5):
+    def procesarArchivos(self, folder_path: str, max_workers=10, max_intentos=5):
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f"La carpeta '{folder_path}' no se encontró.")
         
         archivos_encontrados = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
         
-        # Ejecutar en paralelo usando ThreadPoolExecutor
         lista_dataframes = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            # Ejecutar la función `procesarArchivo` en paralelo para cada archivo
             futuros = [executor.submit(self.procesarArchivo, file_path, max_intentos) for file_path in archivos_encontrados]
             
             for futuro in concurrent.futures.as_completed(futuros):
                 try:
                     resultado = futuro.result()
                     if resultado is not None:
-                        lista_dataframes.append(resultado)  # Agregar DataFrame a la lista si tuvo éxito
+                        lista_dataframes.append(resultado)
                 except Exception as e:
-                    print(f"Error procesando un archivo: {e}")
+                    print(f"Error procesando un archivo en paralelo: {e}")
 
-        # Concatenar todos los DataFrames en uno solo
         if lista_dataframes:
             df_final = pd.concat(lista_dataframes, ignore_index=True)
-            print("Todos los DataFrames unidos en uno solo:")
             return df_final
         else:
-            print("No se generaron DataFrames.")
+            print("Error: No se generaron DataFrames.")
             return None

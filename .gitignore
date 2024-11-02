@@ -12,3 +12,5 @@
 # Ignorar los tests individuales
 /tests/*
 
+# ignorar logs
+/logs/*
